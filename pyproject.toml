@@ -1,0 +1,15 @@
+[project]
+name = "quantlab"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "bottleneck>=1.5.0",
+    "matplotlib>=3.10.3",
+    "numbagg>=0.9.0",
+    "numpy>=2.2.6",
+    "plotly-stubs>=0.0.5",
+    "plotly[express]>=6.1.1",
+    "polars>=1.30.0",
+]
