@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from frames.graphs.design import FigureSetup, Colors
+from quantlab.frames.graphs.design import FigureSetup, Colors
 import plotly.graph_objects as go  # type: ignore
-from frames.main import FrameBase
+from quantlab.frames.main import FrameBase
 
 class Graph(ABC):
     def __init__(self, formatted_data: FrameBase) -> None:

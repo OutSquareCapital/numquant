@@ -1,10 +1,10 @@
 from typing import Self
 import polars as pl
-from arrays.main import ArrayBase
-from frames.graphs import FrameVisualizer
-from frames.main import FrameBase
-from frames.seasonality import SeasonalityExecutor
-from interfaces.types import ArrayWrapper, Attributes, values, date, date_name
+from quantlab.arrays.main import ArrayBase
+from quantlab.frames.graphs import FrameVisualizer
+from quantlab.frames.main import FrameBase
+from quantlab.frames.seasonality import SeasonalityExecutor
+from quantlab.interfaces.types import ArrayWrapper, Attributes, values, date, date_name
 
 
 class Array(ArrayBase):

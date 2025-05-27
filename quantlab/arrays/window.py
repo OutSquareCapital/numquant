@@ -1,9 +1,9 @@
 import bottleneck as bn  # type: ignore
 import numbagg as nbg
 
-from funcs import get_kurtosis, get_skewness
-from interfaces.core import AbstractContainer, AbstractWindowExecutor
-from interfaces.types import Attributes, ArrayWrapper
+from quantlab.funcs import get_kurtosis, get_skewness
+from quantlab.interfaces.core import AbstractContainer, AbstractWindowExecutor
+from quantlab.interfaces.types import Attributes, ArrayWrapper
 from numpy.typing import NDArray
 import numpy as np
 

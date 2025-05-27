@@ -3,12 +3,12 @@ from typing import Any, Self
 
 import polars as pl
 
-from interfaces.executors import (
+from quantlab.interfaces.executors import (
     AbstractAggregateExecutor,
     AbstractConverterExecutor,
     AbstractWindowExecutor,
 )
-from interfaces.types import ArrayWrapper, Attributes
+from quantlab.interfaces.types import ArrayWrapper, Attributes
 
 
 class AbstractContainer[T: pl.DataFrame | ArrayWrapper](ABC):

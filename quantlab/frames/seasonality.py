@@ -1,7 +1,7 @@
 import polars as pl
-from interfaces.types import Attributes, values, date
-from frames.main import FrameBase
-from interfaces.executors import ExecutorProtocol
+from quantlab.interfaces.types import Attributes, values, date
+from quantlab.frames.main import FrameBase
+from quantlab.interfaces.executors import ExecutorProtocol
 # TODO: etudier comment vrmt utiliser la seasonality, plutot que de mettre des trucs o bol
 
 

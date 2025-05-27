@@ -1,8 +1,8 @@
 import polars as pl
 
-from interfaces.core import AbstractContainer
-from interfaces.executors import AbstractAggregateExecutor
-from interfaces.types import Attributes, values
+from quantlab.interfaces.core import AbstractContainer
+from quantlab.interfaces.executors import AbstractAggregateExecutor
+from quantlab.interfaces.types import Attributes, values
 
 
 class FrameAggregateExecutor[T: AbstractContainer[pl.DataFrame]](

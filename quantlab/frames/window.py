@@ -1,7 +1,7 @@
 import polars as pl
 
-from interfaces.core import AbstractContainer, AbstractWindowExecutor
-from interfaces.types import Attributes, values, date
+from quantlab.interfaces.core import AbstractContainer, AbstractWindowExecutor
+from quantlab.interfaces.types import Attributes, values, date
 
 class FrameWindowExecutor[T: AbstractContainer[pl.DataFrame]](
     AbstractWindowExecutor[T]

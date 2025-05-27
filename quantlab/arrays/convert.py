@@ -1,8 +1,8 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from interfaces.core import AbstractContainer, AbstractConverterExecutor
-from interfaces.types import ArrayWrapper, Attributes
+from quantlab.interfaces.core import AbstractContainer, AbstractConverterExecutor
+from quantlab.interfaces.types import ArrayWrapper, Attributes
 
 
 class ArrayConverterExecutor[T: AbstractContainer[ArrayWrapper]](

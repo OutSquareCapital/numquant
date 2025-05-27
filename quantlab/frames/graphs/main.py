@@ -1,5 +1,5 @@
-from frames.main import FrameBase
-from frames.graphs.implementations import (
+from quantlab.frames.main import FrameBase
+from quantlab.frames.graphs.implementations import (
     Bars,
     Boxes,
     Curves,

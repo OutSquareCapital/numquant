@@ -2,11 +2,11 @@ from typing import Self
 
 import polars as pl
 
-from frames.aggregate import FrameAggregateExecutor
-from frames.convert import FrameConverterExecutor
-from frames.window import FrameWindowExecutor
-from interfaces.core import AbstractContainer
-from interfaces.types import Attributes, values, date
+from quantlab.frames.aggregate import FrameAggregateExecutor
+from quantlab.frames.convert import FrameConverterExecutor
+from quantlab.frames.window import FrameWindowExecutor
+from quantlab.interfaces.core import AbstractContainer
+from quantlab.interfaces.types import Attributes, values, date
 
 class FrameBase(AbstractContainer[pl.DataFrame]):
     __slots__ = Attributes.DATA

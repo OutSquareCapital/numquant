@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Self, Any, Protocol
-from interfaces.types import Attributes
+from quantlab.interfaces.types import Attributes
 
 class ContainerProtocol[T](Protocol):
     data: T

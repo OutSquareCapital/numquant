@@ -4,12 +4,12 @@ import numbagg as nbg
 import numpy as np
 from numpy.typing import NDArray
 
-from arrays.aggregate import ArrayAggregateExecutor
-from arrays.convert import ArrayConverterExecutor
-from arrays.window import ArrayWindowExecutor
-from funcs import cross_rank_normalized
-from interfaces.core import AbstractContainer
-from interfaces.types import ArrayWrapper, Attributes, Scalars
+from quantlab.arrays.aggregate import ArrayAggregateExecutor
+from quantlab.arrays.convert import ArrayConverterExecutor
+from quantlab.arrays.window import ArrayWindowExecutor
+from quantlab.funcs import cross_rank_normalized
+from quantlab.interfaces.core import AbstractContainer
+from quantlab.interfaces.types import ArrayWrapper, Attributes, Scalars
 
 
 class ArrayBase(AbstractContainer[ArrayWrapper]):

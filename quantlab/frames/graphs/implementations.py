@@ -1,8 +1,8 @@
 import plotly.graph_objects as go
 import polars as pl
-from frames.graphs.interface import Graph
-from frames.main import FrameBase
-from frames.graphs.design import (
+from quantlab.frames.graphs.interface import Graph
+from quantlab.frames.main import FrameBase
+from quantlab.frames.graphs.design import (
     Colors,
     CustomHovers,
     get_color_map,
