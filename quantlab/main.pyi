@@ -125,7 +125,7 @@ class Frame(FrameBase):
 def to_frame(df: pl.DataFrame, values_col: str, on: str) -> Frame:
     """Crée une Frame à partir d’un DataFrame Polars.
 
-    Pivote le DataFrame selon la colonne `on` et les valeurs `values_col`.
+    Pivote le DataFrame selon la colonne `on` et les valeurs `values_col`, trie par date, puis retourne une instance de Frame.
 
     Args:
         df (pl.DataFrame): DataFrame contenant au moins les colonnes `on` et `values_col`.
@@ -144,7 +144,7 @@ def to_frame(df: pl.DataFrame, values_col: str, on: str) -> Frame:
 def to_array(df: pl.DataFrame, values_col: str, on: str) -> Array:
     """Crée un Array à partir d’un DataFrame Polars.
 
-    Pivote, extrait la matrice de valeurs et l’index, puis enveloppe le tout dans un Array.
+    Pivote, extrait la matrice de valeurs et l’index, trie par date, puis enveloppe le tout dans un Array.
 
     Args:
         df (pl.DataFrame): DataFrame contenant les colonnes à pivoter.

@@ -55,14 +55,14 @@ def to_frame(df: pl.DataFrame, values_col: str, on: str) -> Frame:
     return Frame(
         data=df.pivot(
             on=on, index=date_name, values=values_col, aggregate_function="mean"
-        )
+        ).sort(by=date_name)
     )
 
 
 def to_array(df: pl.DataFrame, values_col: str, on: str) -> Array:
     large_df: pl.DataFrame = df.pivot(
         on=on, index=date_name, values=values_col, aggregate_function="mean"
-    )
+    ).sort(by=date_name)
     data_df: pl.DataFrame = large_df.select(values())
 
     return Array(
