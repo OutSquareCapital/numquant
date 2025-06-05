@@ -8,6 +8,7 @@ dependencies = [
     "bottleneck>=1.5.0",
     "ipykernel>=6.29.5",
     "matplotlib>=3.10.3",
+    "numba>=0.61.2",
     "numbagg>=0.9.0",
     "numpy>=2.2.6",
     "plotly-stubs>=0.0.5",
