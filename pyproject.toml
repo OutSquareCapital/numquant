@@ -14,4 +14,5 @@ dependencies = [
     "plotly-stubs>=0.0.5",
     "plotly[express]>=6.1.1",
     "polars>=1.30.0",
+    "ruff>=0.11.12",
 ]
