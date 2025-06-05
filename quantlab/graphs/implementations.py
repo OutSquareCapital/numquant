@@ -15,7 +15,7 @@ class Curves(Graph):
         color_map: dict[str, str] = get_color_map(assets=data.names.to_list())
         for column in data.values:
             self.figure.add_trace(
-                trace=go.Scattergl(  # type: ignore
+                trace=go.Scattergl( # type: ignore
                     y=column,
                     x=data.index,
                     mode="lines",
@@ -51,7 +51,7 @@ class Boxes(Graph):
         for column in data.values:
             self.figure.add_trace(
                 trace=go.Box(
-                    y=column,  # type: ignore
+                    y=column,
                     name=column.name,
                     marker=get_marker_config(color=color_map[column.name]),
                     boxpoints=False,

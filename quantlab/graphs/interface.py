@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from quantlab.graphs.design import FigureSetup, Colors
-import plotly.graph_objects as go  # type: ignore
+import plotly.graph_objects as go
 from quantlab.types import ArrayBase
 
 class Graph(ABC):
@@ -9,14 +9,14 @@ class Graph(ABC):
         self.setup_figure(data=data)
         self._setup_general_design()
         self._setup_axes()
-        self.figure.show()  # type: ignore
+        self.figure.show()
 
     @abstractmethod
     def setup_figure(self, data: ArrayBase) -> None:
         raise NotImplementedError
 
     def _setup_general_design(self) -> None:
-        self.figure.update_layout(  # type: ignore
+        self.figure.update_layout(
             font=FigureSetup.TEXT_FONT.value,
             autosize=True,
             margin=dict(l=30, r=30, t=40, b=30),
@@ -28,10 +28,10 @@ class Graph(ABC):
         )
 
     def _setup_axes(self) -> None:
-        self.figure.update_yaxes(  # type: ignore
+        self.figure.update_yaxes(
             showgrid=False, automargin=True
         )
 
-        self.figure.update_xaxes(  # type: ignore
+        self.figure.update_xaxes(
             showgrid=False, automargin=True
         )
