@@ -1,8 +1,7 @@
 import plotly.graph_objects as go
-import polars as pl
-from quantlab.frames.graphs.interface import Graph
-from quantlab.frames.main import FrameBase
-from quantlab.frames.graphs.design import (
+from quantlab.graphs.interface import Graph
+from quantlab.types import ArrayBase
+from quantlab.graphs.design import (
     Colors,
     CustomHovers,
     get_color_map,
@@ -10,14 +9,15 @@ from quantlab.frames.graphs.design import (
     get_marker_config,
 )
 
+
 class Curves(Graph):
-    def setup_figure(self, formatted_data: FrameBase) -> None:
-        color_map: dict[str, str] = get_color_map(assets=formatted_data.names)
-        for column in formatted_data.values:
+    def setup_figure(self, data: ArrayBase) -> None:
+        color_map: dict[str, str] = get_color_map(assets=data.names.to_list())
+        for column in data.values:
             self.figure.add_trace(
-                trace=go.Scattergl( # type: ignore
+                trace=go.Scattergl(  # type: ignore
                     y=column,
-                    x=formatted_data.index,
+                    x=data.index,
                     mode="lines",
                     name=column.name,
                     line=dict(width=2, color=color_map[column.name]),
@@ -27,11 +27,11 @@ class Curves(Graph):
 
 
 class Violins(Graph):
-    def setup_figure(self, formatted_data: FrameBase) -> None:
-        color_map: dict[str, str] = get_color_map(assets=formatted_data.names)
-        for column in formatted_data.values:
+    def setup_figure(self, data: ArrayBase) -> None:
+        color_map: dict[str, str] = get_color_map(assets=data.names.to_list())
+        for column in data.values:
             self.figure.add_trace(
-                trace=go.Violin( # type: ignore
+                trace=go.Violin(  # type: ignore
                     y=column,
                     name=column.name,
                     box_visible=True,
@@ -46,12 +46,12 @@ class Violins(Graph):
 
 
 class Boxes(Graph):
-    def setup_figure(self, formatted_data: FrameBase) -> None:
-        color_map: dict[str, str] = get_color_map(assets=formatted_data.names)
-        for column in formatted_data.values:
+    def setup_figure(self, data: ArrayBase) -> None:
+        color_map: dict[str, str] = get_color_map(assets=data.names.to_list())
+        for column in data.values:
             self.figure.add_trace(
                 trace=go.Box(
-                    y=column, # type: ignore
+                    y=column,  # type: ignore
                     name=column.name,
                     marker=get_marker_config(color=color_map[column.name]),
                     boxpoints=False,
@@ -59,60 +59,52 @@ class Boxes(Graph):
                 )
             )
 
+
 class Histograms(Graph):
-    def setup_figure(self, formatted_data: FrameBase) -> None:
-        color_map: dict[str, str] = get_color_map(assets=formatted_data.names)
-        for column in formatted_data.values:
+    def setup_figure(self, data: ArrayBase) -> None:
+        color_map: dict[str, str] = get_color_map(assets=data.names.to_list())
+        for column in data.values:
             self.figure.add_trace(
-                trace=go.Histogram( # type: ignore
+                trace=go.Histogram(  # type: ignore
                     x=column,
                     name=column.name,
                     marker=get_marker_config(color=color_map[column.name]),
                     hovertemplate=CustomHovers.HORIZONTAL_DATA.value,
                 )
             )
-        self.figure.update_layout(
-            barmode="overlay"
-        )
+        self.figure.update_layout(barmode="overlay")
 
 
 class Bars(Graph):
-    def setup_figure(self, formatted_data: FrameBase) -> None:
-        df: pl.DataFrame = formatted_data.data.unpivot().sort(by="value")
-        names: list[str] = df.select(pl.col(name="variable")).to_series().to_list()
-
-        color_map: dict[str, str] = get_color_map(assets=names)
-        for label, value in df.iter_rows():
+    def setup_figure(self, data: ArrayBase) -> None:
+        color_map: dict[str, str] = get_color_map(assets=data.names.to_list())
+        for label, value in data.iter_rows():  # type: ignore
             self.figure.add_trace(
                 trace=go.Bar(
                     x=[label],
-                    y=[value],
-                    name=label,
+                    y=[value],  # type: ignore
+                    name=label,  # type: ignore
                     marker=get_marker_config(color=color_map[label]),
                     hovertemplate=CustomHovers.VERTICAL_DATA.value,
                 )
             )
 
-        self.figure.update_layout(
-            xaxis=dict(showticklabels=False)
-        )
+        self.figure.update_layout(xaxis=dict(showticklabels=False))
 
 
 class HeatMap(Graph):
-    def setup_figure(self, formatted_data: FrameBase) -> None:
+    def setup_figure(self, data: ArrayBase) -> None:
         color_scale: list[list[float | str]] = get_heatmap_colorscale()
         self.figure.add_trace(
             trace=go.Heatmap(
-                z=formatted_data.values, # type: ignore
-                x=formatted_data.names, # type: ignore
-                y=formatted_data.names, # type: ignore
+                z=data.values,  # type: ignore
+                x=data.names,  # type: ignore
+                y=data.names,  # type: ignore
                 showscale=False,
-                colorscale=color_scale, # type: ignore
+                colorscale=color_scale,  # type: ignore
                 hovertemplate=CustomHovers.HEATMAP.value,
             )
         )
-        self.figure.update_layout(
-            yaxis=dict(showgrid=False, autorange="reversed")
-        )
+        self.figure.update_layout(yaxis=dict(showgrid=False, autorange="reversed"))
         self.figure.update_yaxes(showticklabels=False, scaleanchor="x")
         self.figure.update_xaxes(showticklabels=False)

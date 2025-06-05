@@ -1,18 +1,18 @@
 from abc import ABC, abstractmethod
-from quantlab.frames.graphs.design import FigureSetup, Colors
+from quantlab.graphs.design import FigureSetup, Colors
 import plotly.graph_objects as go  # type: ignore
-from quantlab.frames.main import FrameBase
+from quantlab.types import ArrayBase
 
 class Graph(ABC):
-    def __init__(self, formatted_data: FrameBase) -> None:
+    def __init__(self, data: ArrayBase) -> None:
         self.figure = go.Figure()
-        self.setup_figure(formatted_data=formatted_data)
+        self.setup_figure(data=data)
         self._setup_general_design()
         self._setup_axes()
         self.figure.show()  # type: ignore
 
     @abstractmethod
-    def setup_figure(self, formatted_data: FrameBase) -> None:
+    def setup_figure(self, data: ArrayBase) -> None:
         raise NotImplementedError
 
     def _setup_general_design(self) -> None:

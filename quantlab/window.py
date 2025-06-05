@@ -1,17 +1,16 @@
 import bottleneck as bn  # type: ignore
 import numbagg as nbg
-
-from quantlab.funcs import get_kurtosis, get_skewness
-from quantlab.interfaces.core import AbstractContainer, AbstractWindowExecutor
-from quantlab.interfaces.types import Attributes, ArrayWrapper
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
+from dataclasses import dataclass
+from quantlab.funcs import get_kurtosis, get_skewness
+from quantlab.types import ArrayBase
 
-
-class ArrayWindowExecutor[T: AbstractContainer[ArrayWrapper]](
-    AbstractWindowExecutor[T]
-):
-    __slots__ = (Attributes.PARENT, Attributes.LEN, Attributes.MIN_LEN)
+@dataclass(slots=True)
+class ArrayWindowExecutor[T: ArrayBase]:
+    _parent: T
+    _len: int
+    _min_len: int
 
     def _compute(self, value: NDArray[np.float32]) -> T:
         return self._parent.new(data=value)
@@ -19,13 +18,13 @@ class ArrayWindowExecutor[T: AbstractContainer[ArrayWrapper]](
     def sharpe(self) -> T:
         return self._compute(
             value=bn.move_mean(  # type: ignore
-                self._parent.data.values,
+                self._parent.values,
                 window=self._len,
                 min_count=self._min_len,
                 axis=0,
             )
             / bn.move_std(  # type: ignore
-                self._parent.data.values,
+                self._parent.values,
                 window=self._len,
                 min_count=self._min_len,
                 axis=0,
@@ -36,7 +35,7 @@ class ArrayWindowExecutor[T: AbstractContainer[ArrayWrapper]](
     def mean(self) -> T:
         return self._compute(
             value=bn.move_mean(  # type: ignore
-                self._parent.data.values,
+                self._parent.values,
                 window=self._len,
                 min_count=self._min_len,
                 axis=0,
@@ -46,7 +45,7 @@ class ArrayWindowExecutor[T: AbstractContainer[ArrayWrapper]](
     def median(self) -> T:
         return self._compute(
             value=bn.move_median(  # type: ignore
-                self._parent.data.values,
+                self._parent.values,
                 window=self._len,
                 min_count=self._min_len,
                 axis=0,
@@ -56,7 +55,7 @@ class ArrayWindowExecutor[T: AbstractContainer[ArrayWrapper]](
     def max(self) -> T:
         return self._compute(
             value=bn.move_max(  # type: ignore
-                self._parent.data.values,
+                self._parent.values,
                 window=self._len,
                 min_count=self._min_len,
                 axis=0,
@@ -66,7 +65,7 @@ class ArrayWindowExecutor[T: AbstractContainer[ArrayWrapper]](
     def min(self) -> T:
         return self._compute(
             value=bn.move_min(  # type: ignore
-                self._parent.data.values,
+                self._parent.values,
                 window=self._len,
                 min_count=self._min_len,
                 axis=0,
@@ -76,7 +75,7 @@ class ArrayWindowExecutor[T: AbstractContainer[ArrayWrapper]](
     def sum(self) -> T:
         return self._compute(
             value=bn.move_sum(  # type: ignore
-                self._parent.data.values,
+                self._parent.values,
                 window=self._len,
                 min_count=self._min_len,
                 axis=0,
@@ -86,7 +85,7 @@ class ArrayWindowExecutor[T: AbstractContainer[ArrayWrapper]](
     def stdev(self) -> T:
         return self._compute(
             value=bn.move_std(  # type: ignore
-                self._parent.data.values,
+                self._parent.values,
                 window=self._len,
                 min_count=self._min_len,
                 axis=0,
@@ -95,9 +94,9 @@ class ArrayWindowExecutor[T: AbstractContainer[ArrayWrapper]](
         )
 
     def stdev_ew(self) -> T:
-        temp: NDArray[np.float32] = self._parent.data.values.copy()
+        temp: NDArray[np.float32] = self._parent.values.copy()
         nbg.move_exp_nanstd(  # type: ignore
-            self._parent.data.values,
+            self._parent.values,
             alpha=1 / self._len,
             axis=0,
             out=temp,
@@ -107,7 +106,7 @@ class ArrayWindowExecutor[T: AbstractContainer[ArrayWrapper]](
     def skew(self) -> T:
         return self._compute(
             value=get_skewness(
-                array=self._parent.data.values,
+                array=self._parent.values,
                 length=self._len,
                 min_length=self._min_len,
             )
@@ -116,9 +115,8 @@ class ArrayWindowExecutor[T: AbstractContainer[ArrayWrapper]](
     def kurt(self) -> T:
         return self._compute(
             value=get_kurtosis(
-                array=self._parent.data.values,
+                array=self._parent.values,
                 length=self._len,
                 min_length=self._min_len,
             )
         )
-
