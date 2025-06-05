@@ -111,7 +111,7 @@ class ArrayBase:
 
     def backfill(self) -> Self:
         return self.new(
-            data=nbg.bfill(arr=self.values, axis=0, out=self.values) # type: ignore
+            data=nbg.bfill(arr=self.values, axis=0, out=self.values)
         )
 
     def long_bias(self) -> Self:

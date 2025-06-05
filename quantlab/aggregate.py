@@ -1,9 +1,12 @@
-import bottleneck as bn  # type: ignore
+from dataclasses import dataclass
+
+import bottleneck as bn
 import numpy as np
 from numpy.typing import NDArray
-from dataclasses import dataclass
+
 from quantlab.funcs import get_skewness
 from quantlab.types import ArrayBase, Scalars
+
 
 @dataclass(slots=True)
 class ArrayAggregateExecutor[T: ArrayBase]:
@@ -13,68 +16,29 @@ class ArrayAggregateExecutor[T: ArrayBase]:
         return self._parent.new(data=value.reshape(-1, 1))
 
     def mean(self) -> T:
-        return self._compute(
-            value=bn.nanmean(  # type: ignore
-                self._parent.values,
-                axis=0,
-            )
-        )
+        return self._compute(value=bn.nanmean(a=self._parent.values, axis=0))
 
     def median(self) -> T:
-        return self._compute(
-            value=bn.nanmedian(  # type: ignore
-                self._parent.values,
-                axis=0,
-            )
-        )
+        return self._compute(value=bn.nanmedian(a=self._parent.values, axis=0))
 
     def max(self) -> T:
-        return self._compute(
-            value=bn.nanmax(  # type: ignore
-                self._parent.values,
-                axis=0,
-            )
-        )
+        return self._compute(value=bn.nanmax(a=self._parent.values, axis=0))
 
     def min(self) -> T:
-        return self._compute(
-            value=bn.nanmin(  # type: ignore
-                self._parent.values,
-                axis=0,
-            )
-        )
+        return self._compute(value=bn.nanmin(a=self._parent.values, axis=0))
 
     def sum(self) -> T:
-        return self._compute(
-            value=bn.nansum(  # type: ignore
-                self._parent.values,
-                axis=0,
-            )
-        )
+        return self._compute(value=bn.nansum(a=self._parent.values, axis=0))
 
     def stdev(self) -> T:
         return self._compute(
-            value=bn.nanstd(  # type: ignore
-                self._parent.values,
-                axis=0,
-                ddof=1,
-            )
-            * Scalars.ANNUAL
+            value=bn.nanstd(a=self._parent.values, axis=0, ddof=1) * Scalars.ANNUAL
         )
 
     def sharpe(self) -> T:
-        return self._compute(
-            value=bn.nanmean(  # type: ignore
-                self._parent.values,
-                axis=0,
-            )
-            / bn.nanstd(  # type: ignore
-                self._parent.values,
-                axis=0,
-                ddof=1,
-            )
-            * Scalars.ANNUAL
-        )
+        mean: NDArray[np.float32] = bn.nanmean(a=self._parent.values, axis=0)
+        stdev: NDArray[np.float32] = bn.nanstd(a=self._parent.values, axis=0, ddof=1)
+        return self._compute(value=mean / stdev * Scalars.ANNUAL)
 
     def skew(self) -> T:
         return self._compute(
