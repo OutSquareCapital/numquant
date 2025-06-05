@@ -1,27 +1,27 @@
 from dataclasses import dataclass
 from typing import Self
 
-from quantlab.aggregate import ArrayAggregateExecutor
-from quantlab.convert import ArrayConverterExecutor
+from quantlab.aggregate import AggregateExecutor
+from quantlab.convert import ConverterExecutor
 from quantlab.interface import ArrayBase
-from quantlab.window import ArrayWindowExecutor
+from quantlab.window import WindowExecutor
 
 
 @dataclass(slots=True, repr=False)
 class Array(ArrayBase):
-    def rolling(self, len: int) -> ArrayWindowExecutor[Self]:
-        return ArrayWindowExecutor(_parent=self, _len=len, _min_len=len)
+    def rolling(self, len: int) -> WindowExecutor[Self]:
+        return WindowExecutor(_parent=self, _len=len, _min_len=len)
 
-    def expanding(self, min_len: int) -> ArrayWindowExecutor[Self]:
-        return ArrayWindowExecutor(_parent=self, _len=self.height, _min_len=min_len)
-
-    @property
-    def agg(self) -> ArrayAggregateExecutor[Self]:
-        return ArrayAggregateExecutor(_parent=self)
+    def expanding(self, min_len: int) -> WindowExecutor[Self]:
+        return WindowExecutor(_parent=self, _len=self.height, _min_len=min_len)
 
     @property
-    def convert(self) -> ArrayConverterExecutor[Self]:
-        return ArrayConverterExecutor(parent=self)
+    def agg(self) -> AggregateExecutor[Self]:
+        return AggregateExecutor(_parent=self)
+
+    @property
+    def convert(self) -> ConverterExecutor[Self]:
+        return ConverterExecutor(parent=self)
 
     def normalize_signal(self) -> Self:
         median_row: Self = (

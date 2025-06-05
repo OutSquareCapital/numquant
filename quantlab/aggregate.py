@@ -9,7 +9,7 @@ from quantlab.types import Scalars
 from quantlab.interface import ArrayBase
 
 @dataclass(slots=True)
-class ArrayAggregateExecutor[T: ArrayBase]:
+class AggregateExecutor[T: ArrayBase]:
     _parent: T
 
     def _compute(self, value: NDArray[np.float32]) -> T:

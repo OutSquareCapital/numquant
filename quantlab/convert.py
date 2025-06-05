@@ -1,106 +1,92 @@
 import numpy as np
 from numpy.typing import NDArray
-from dataclasses import dataclass
-from quantlab.types import ArrayBase
 
-@dataclass(slots=True)
-class ArrayConverterExecutor[T: ArrayBase]:
-    _parent: T
+from quantlab.interface import ArrayBase
 
-    def _compute(self, value: NDArray[np.float32]) -> T:
-        return self._parent.new(data=value)
+
+class ConverterExecutor[T: ArrayBase]:
+    __slots__ = ("_parent", "_temp", "_result")
+    def __init__(self, parent: T) -> None:
+        self._parent: T = parent
+        self._temp: NDArray[np.float32] = parent.values.copy()
+        self._result: NDArray[np.float32] = np.empty_like(self._temp, dtype=np.float32)
+
+    def _compute(self) -> T:
+        return self._parent.new(data=self._result)
+
+    def _ratios(self) -> NDArray[np.float32]:
+        return self._temp[1:] / self._temp[:-1]
 
     def equity_to_log(self) -> T:
-        temp: NDArray[np.float32] = self._parent.values.copy()
-        result = np.empty_like(temp, dtype=np.float32)
-        ratios = temp[1:] / temp[:-1]
-        result[0] = np.nan
-        result[1:] = np.log(ratios)
-        return self._compute(value=result)
+        self._result[0] = np.nan
+        self._result[1:] = np.log(self._ratios())
+        return self._compute()
 
     def equity_to_pct(self) -> T:
-        temp: NDArray[np.float32] = self._parent.values.copy()
-        result = np.empty_like(temp, dtype=np.float32)
-        ratios = temp[1:] / temp[:-1]
-        result[0] = np.nan
-        result[1:] = ratios - 1
-        return self._compute(value=result)
+        self._result[0] = np.nan
+        self._result[1:] = self._ratios() - 1
+        return self._compute()
 
     def equity_to_equity_log(self) -> T:
-        temp: NDArray[np.float32] = self._parent.values.copy()
-        result = np.empty_like(temp, dtype=np.float32)
-        mask = np.isnan(temp)
-        result[mask] = np.nan
-        result[~mask] = np.log(temp[~mask])
-        return self._compute(value=result)
+        mask = np.isnan(self._temp)
+        self._result[mask] = np.nan
+        self._result[~mask] = np.log(self._temp[~mask])
+        return self._compute()
 
     def equity_log_to_equity(self) -> T:
-        temp: NDArray[np.float32] = self._parent.values.copy()
-        equity_values = np.empty_like(temp, dtype=np.float32)
-        mask = np.isnan(temp)
-        equity_values[mask] = np.nan
-        equity_values[~mask] = np.exp(temp[~mask])
-        return self._compute(value=equity_values)
+        mask = np.isnan(self._temp)
+        self._result[mask] = np.nan
+        self._result[~mask] = np.exp(self._temp[~mask])
+        return self._compute()
 
     def equity_log_to_log(self) -> T:
-        temp: NDArray[np.float32] = self._parent.values.copy()
-        difference = temp[1:] - temp[:-1]
-        result = np.empty_like(temp, dtype=np.float32)
-        result[0] = np.nan
-        result[1:] = difference
-        return self._compute(value=result)
+        difference = self._temp[1:] - self._temp[:-1]
+        self._result[0] = np.nan
+        self._result[1:] = difference
+        return self._compute()
 
     def pct_to_equity(self) -> T:
-        temp: NDArray[np.float32] = self._parent.values.copy()
-        result = np.empty_like(temp, dtype=np.float32)
-        mask = np.isnan(temp)
-        temp[mask] = 0
-        result[:0] = np.nan
-        result[0:] = np.cumprod(a=1 + temp[0:], axis=0)
-        result[mask] = np.nan
-        return self._compute(value=result)
+        mask = np.isnan(self._temp)
+        self._temp[mask] = 0
+        self._result[:0] = np.nan
+        self._result[0:] = np.cumprod(a=1 + self._temp[0:], axis=0)
+        self._result[mask] = np.nan
+        return self._compute()
 
     def pct_to_log(self) -> T:
-        temp: NDArray[np.float32] = self._parent.values.copy()
-        mask = np.isnan(temp)
-        temp_clean: NDArray[np.float32] = temp.copy()
+        mask = np.isnan(self._temp)
+        temp_clean: NDArray[np.float32] = self._temp.copy()
         temp_clean[mask] = 0
-        log_values = np.log1p(temp_clean)
-        log_values[mask] = np.nan
-        return self._compute(value=log_values)
+        self._result = np.log1p(temp_clean)
+        self._result[mask] = np.nan
+        return self._compute()
 
     def log_to_pct(self) -> T:
-        temp: NDArray[np.float32] = self._parent.values.copy()
-        mask = np.isnan(temp)
-        temp_clean: NDArray[np.float32] = temp.copy()
+        mask = np.isnan(self._temp)
+        temp_clean: NDArray[np.float32] = self._temp.copy()
         temp_clean[mask] = 0
-        pct_values = np.exp(temp_clean) - np.float32(1)
-        pct_values[mask] = np.nan
-        return self._compute(value=pct_values)
+        self._result = np.exp(temp_clean) - np.float32(1)
+        self._result[mask] = np.nan
+        return self._compute()
 
     def log_to_equity_log(self) -> T:
-        temp: NDArray[np.float32] = self._parent.values.copy()
-        result = np.empty_like(temp, dtype=np.float32)
-        mask = np.isnan(temp)
-        temp[mask] = 0
-        result[:0] = np.nan
-        result[0:] = np.cumsum(a=temp[0:], axis=0)
-        result[mask] = np.nan
-        return self._compute(value=result)
+        mask = np.isnan(self._temp)
+        self._temp[mask] = 0
+        self._result[:0] = np.nan
+        self._result[0:] = np.cumsum(a=self._temp[0:], axis=0)
+        self._result[mask] = np.nan
+        return self._compute()
 
     def pct_to_equity_log(self) -> T:
-        temp: NDArray[np.float32] = self._parent.values.copy()
-        mask = np.isnan(temp)
-        temp_clean: NDArray[np.float32] = temp.copy()
+        mask = np.isnan(self._temp)
+        temp_clean: NDArray[np.float32] = self._temp.copy()
         temp_clean[mask] = 0
-        log_values = np.log1p(temp_clean)
-        cumulative_log = np.cumsum(log_values, axis=0)
-        cumulative_log[mask] = np.nan
-        return self._compute(value=cumulative_log)
+        log_values: NDArray[np.float32] = np.log1p(temp_clean)
+        self._result = np.cumsum(log_values, axis=0)
+        self._result[mask] = np.nan
+        return self._compute()
 
     def shift(self) -> T:
-        temp: NDArray[np.float32] = self._parent.values.copy()
-        shifted: NDArray[np.float32] = np.empty_like(temp, dtype=np.float32)
-        shifted[1:, :] = temp[:-1, :]
-        shifted[:1, :] = np.nan
-        return self._compute(value=shifted)
+        self._result[1:, :] = self._temp[:-1, :]
+        self._result[:1, :] = np.nan
+        return self._compute()

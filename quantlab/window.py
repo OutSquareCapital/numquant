@@ -8,7 +8,7 @@ from quantlab.interface import ArrayBase
 
 
 @dataclass(slots=True)
-class ArrayWindowExecutor[T: ArrayBase]:
+class WindowExecutor[T: ArrayBase]:
     _parent: T
     _len: int
     _min_len: int
@@ -32,21 +32,21 @@ class ArrayWindowExecutor[T: ArrayBase]:
     def mean(self) -> T:
         return self._compute(
             value=bn.move_mean(
-                self._parent.values, window=self._len, min_count=self._min_len, axis=0
+                a=self._parent.values, window=self._len, min_count=self._min_len, axis=0
             )
         )
 
     def median(self) -> T:
         return self._compute(
             value=bn.move_median(
-                self._parent.values, window=self._len, min_count=self._min_len, axis=0
+                a=self._parent.values, window=self._len, min_count=self._min_len, axis=0
             )
         )
 
     def max(self) -> T:
         return self._compute(
             value=bn.move_max(
-                self._parent.values, window=self._len, min_count=self._min_len, axis=0
+                a=self._parent.values, window=self._len, min_count=self._min_len, axis=0
             )
         )
 
