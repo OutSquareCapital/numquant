@@ -1,14 +1,12 @@
 from abc import ABC, abstractmethod
-from quantlab.graphs.design import FigureSetup, Colors
+from graphs.design import FigureSetup, Colors
 import plotly.graph_objects as go
 import polars as pl
 
+
 class Graph(ABC):
     def __init__(self, data: pl.DataFrame, on: str, index: str, values: str) -> None:
-        df: pl.DataFrame = data.pivot(
-            on=on,
-            index=index,
-            values=values)
+        df: pl.DataFrame = data.pivot(on=on, index=index, values=values)
         idx: pl.Series = df.get_column(name=index)
         self.figure = go.Figure()
         self.setup_figure(data=df.drop(index), index=idx)
@@ -33,10 +31,6 @@ class Graph(ABC):
         )
 
     def _setup_axes(self) -> None:
-        self.figure.update_yaxes(
-            showgrid=False, automargin=True
-        )
+        self.figure.update_yaxes(showgrid=False, automargin=True)
 
-        self.figure.update_xaxes(
-            showgrid=False, automargin=True
-        )
+        self.figure.update_xaxes(showgrid=False, automargin=True)

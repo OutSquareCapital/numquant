@@ -1,4 +1,4 @@
-from quantlab.graphs.implementations import (
+from graphs.implementations import (
     Bars,
     Boxes,
     Curves,
@@ -8,6 +8,7 @@ from quantlab.graphs.implementations import (
 )
 from dataclasses import dataclass
 import polars as pl
+
 
 @dataclass(slots=True)
 class FrameVisualizer:

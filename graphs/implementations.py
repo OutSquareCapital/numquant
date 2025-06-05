@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 import polars as pl
-from quantlab.graphs.interface import Graph
-from quantlab.graphs.design import (
+from graphs.interface import Graph
+from graphs.design import (
     Colors,
     CustomHovers,
     get_color_map,
@@ -15,7 +15,7 @@ class Curves(Graph):
         color_map: dict[str, str] = get_color_map(assets=data.columns)
         for column in data.columns:
             self.figure.add_trace(
-                trace=go.Scattergl( # type: ignore
+                trace=go.Scattergl(  # type: ignore
                     y=data.get_column(name=column).to_numpy(),
                     x=index,
                     mode="lines",
@@ -65,7 +65,7 @@ class Histograms(Graph):
         color_map: dict[str, str] = get_color_map(assets=data.columns)
         for column in data.columns:
             self.figure.add_trace(
-                trace=go.Histogram( # type: ignore
+                trace=go.Histogram(  # type: ignore
                     x=data.get_column(name=column).to_numpy(),
                     name=column,
                     marker=get_marker_config(color=color_map[column]),
@@ -83,7 +83,7 @@ class Bars(Graph):
                 trace=go.Bar(
                     x=[label],
                     y=[value],
-                    name=label, 
+                    name=label,
                     marker=get_marker_config(color=color_map[label]),
                     hovertemplate=CustomHovers.VERTICAL_DATA.value,
                 )
@@ -98,8 +98,8 @@ class HeatMap(Graph):
         self.figure.add_trace(
             trace=go.Heatmap(
                 z=data.to_numpy(),
-                x=data.columns, # type: ignore
-                y=data.columns, # type: ignore
+                x=data.columns,  # type: ignore
+                y=data.columns,  # type: ignore
                 showscale=False,
                 colorscale=color_scale,  # type: ignore
                 hovertemplate=CustomHovers.HEATMAP.value,
