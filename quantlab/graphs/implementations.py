@@ -1,6 +1,6 @@
 import plotly.graph_objects as go
+import polars as pl
 from quantlab.graphs.interface import Graph
-from quantlab.types import ArrayBase
 from quantlab.graphs.design import (
     Colors,
     CustomHovers,
@@ -11,32 +11,32 @@ from quantlab.graphs.design import (
 
 
 class Curves(Graph):
-    def setup_figure(self, data: ArrayBase) -> None:
-        color_map: dict[str, str] = get_color_map(assets=data.names.to_list())
-        for column in data.values:
+    def setup_figure(self, data: pl.DataFrame, index: pl.Series) -> None:
+        color_map: dict[str, str] = get_color_map(assets=data.columns)
+        for column in data.columns:
             self.figure.add_trace(
                 trace=go.Scattergl( # type: ignore
-                    y=column,
-                    x=data.index,
+                    y=data.get_column(name=column).to_numpy(),
+                    x=index,
                     mode="lines",
-                    name=column.name,
-                    line=dict(width=2, color=color_map[column.name]),
+                    name=column,
+                    line=dict(width=2, color=color_map[column]),
                     hovertemplate=CustomHovers.VERTICAL_DATA.value,
                 )
             )
 
 
 class Violins(Graph):
-    def setup_figure(self, data: ArrayBase) -> None:
-        color_map: dict[str, str] = get_color_map(assets=data.names.to_list())
-        for column in data.values:
+    def setup_figure(self, data: pl.DataFrame, index: pl.Series) -> None:
+        color_map: dict[str, str] = get_color_map(assets=data.columns)
+        for column in data.columns:
             self.figure.add_trace(
                 trace=go.Violin(  # type: ignore
                     y=column,
-                    name=column.name,
+                    name=column,
                     box_visible=True,
                     points=False,
-                    marker=get_marker_config(color=color_map[column.name]),
+                    marker=get_marker_config(color=color_map[column]),
                     box_line_color=Colors.WHITE,
                     hoveron="violins",
                     hoverinfo="y",
@@ -46,14 +46,14 @@ class Violins(Graph):
 
 
 class Boxes(Graph):
-    def setup_figure(self, data: ArrayBase) -> None:
-        color_map: dict[str, str] = get_color_map(assets=data.names.to_list())
-        for column in data.values:
+    def setup_figure(self, data: pl.DataFrame, index: pl.Series) -> None:
+        color_map: dict[str, str] = get_color_map(assets=data.columns)
+        for column in data.columns:
             self.figure.add_trace(
                 trace=go.Box(
-                    y=column,
-                    name=column.name,
-                    marker=get_marker_config(color=color_map[column.name]),
+                    y=data.get_column(name=column).to_numpy(),
+                    name=column,
+                    marker=get_marker_config(color=color_map[column]),
                     boxpoints=False,
                     hovertemplate=CustomHovers.VERTICAL_DATA.value,
                 )
@@ -61,14 +61,14 @@ class Boxes(Graph):
 
 
 class Histograms(Graph):
-    def setup_figure(self, data: ArrayBase) -> None:
-        color_map: dict[str, str] = get_color_map(assets=data.names.to_list())
-        for column in data.values:
+    def setup_figure(self, data: pl.DataFrame, index: pl.Series) -> None:
+        color_map: dict[str, str] = get_color_map(assets=data.columns)
+        for column in data.columns:
             self.figure.add_trace(
-                trace=go.Histogram(  # type: ignore
-                    x=column,
-                    name=column.name,
-                    marker=get_marker_config(color=color_map[column.name]),
+                trace=go.Histogram( # type: ignore
+                    x=data.get_column(name=column).to_numpy(),
+                    name=column,
+                    marker=get_marker_config(color=color_map[column]),
                     hovertemplate=CustomHovers.HORIZONTAL_DATA.value,
                 )
             )
@@ -76,14 +76,14 @@ class Histograms(Graph):
 
 
 class Bars(Graph):
-    def setup_figure(self, data: ArrayBase) -> None:
-        color_map: dict[str, str] = get_color_map(assets=data.names.to_list())
-        for label, value in data.iter_rows():  # type: ignore
+    def setup_figure(self, data: pl.DataFrame, index: pl.Series) -> None:
+        color_map: dict[str, str] = get_color_map(assets=data.columns)
+        for label, value in data.iter_rows():
             self.figure.add_trace(
                 trace=go.Bar(
                     x=[label],
-                    y=[value],  # type: ignore
-                    name=label,  # type: ignore
+                    y=[value],
+                    name=label, 
                     marker=get_marker_config(color=color_map[label]),
                     hovertemplate=CustomHovers.VERTICAL_DATA.value,
                 )
@@ -93,13 +93,13 @@ class Bars(Graph):
 
 
 class HeatMap(Graph):
-    def setup_figure(self, data: ArrayBase) -> None:
+    def setup_figure(self, data: pl.DataFrame, index: pl.Series) -> None:
         color_scale: list[list[float | str]] = get_heatmap_colorscale()
         self.figure.add_trace(
             trace=go.Heatmap(
-                z=data.values,  # type: ignore
-                x=data.names,  # type: ignore
-                y=data.names,  # type: ignore
+                z=data.to_numpy(),
+                x=data.columns, # type: ignore
+                y=data.columns, # type: ignore
                 showscale=False,
                 colorscale=color_scale,  # type: ignore
                 hovertemplate=CustomHovers.HEATMAP.value,

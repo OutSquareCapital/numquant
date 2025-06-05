@@ -1,18 +1,23 @@
 from abc import ABC, abstractmethod
 from quantlab.graphs.design import FigureSetup, Colors
 import plotly.graph_objects as go
-from quantlab.interface import ArrayBase
+import polars as pl
 
 class Graph(ABC):
-    def __init__(self, data: ArrayBase) -> None:
+    def __init__(self, data: pl.DataFrame, on: str, index: str, values: str) -> None:
+        df: pl.DataFrame = data.pivot(
+            on=on,
+            index=index,
+            values=values)
+        idx: pl.Series = df.get_column(name=index)
         self.figure = go.Figure()
-        self.setup_figure(data=data)
+        self.setup_figure(data=df.drop(index), index=idx)
         self._setup_general_design()
         self._setup_axes()
         self.figure.show()
 
     @abstractmethod
-    def setup_figure(self, data: ArrayBase) -> None:
+    def setup_figure(self, data: pl.DataFrame, index: pl.Series) -> None:
         raise NotImplementedError
 
     def _setup_general_design(self) -> None:
