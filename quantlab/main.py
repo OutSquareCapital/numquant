@@ -3,7 +3,7 @@ from typing import Self
 
 from quantlab.aggregate import ArrayAggregateExecutor
 from quantlab.convert import ArrayConverterExecutor
-from quantlab.types import ArrayBase
+from quantlab.interface import ArrayBase
 from quantlab.window import ArrayWindowExecutor
 
 
@@ -21,7 +21,7 @@ class Array(ArrayBase):
 
     @property
     def convert(self) -> ArrayConverterExecutor[Self]:
-        return ArrayConverterExecutor(_parent=self)
+        return ArrayConverterExecutor(parent=self)
 
     def normalize_signal(self) -> Self:
         median_row: Self = (

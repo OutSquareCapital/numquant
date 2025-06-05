@@ -5,8 +5,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 from quantlab.funcs import get_skewness
-from quantlab.types import ArrayBase, Scalars
-
+from quantlab.types import Scalars
+from quantlab.interface import ArrayBase
 
 @dataclass(slots=True)
 class ArrayAggregateExecutor[T: ArrayBase]:

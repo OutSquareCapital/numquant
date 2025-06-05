@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from quantlab.graphs.design import FigureSetup, Colors
 import plotly.graph_objects as go
-from quantlab.types import ArrayBase
+from quantlab.interface import ArrayBase
 
 class Graph(ABC):
     def __init__(self, data: ArrayBase) -> None:

@@ -1,4 +1,4 @@
-from quantlab.types import ArrayBase
+from quantlab.interface import ArrayBase
 from quantlab.graphs.implementations import (
     Bars,
     Boxes,

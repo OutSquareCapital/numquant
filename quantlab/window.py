@@ -3,7 +3,8 @@ import numpy as np
 from numpy.typing import NDArray
 from dataclasses import dataclass
 from quantlab.funcs import get_kurtosis, get_skewness
-from quantlab.types import ArrayBase, Scalars
+from quantlab.types import Scalars
+from quantlab.interface import ArrayBase
 
 
 @dataclass(slots=True)
