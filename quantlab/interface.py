@@ -18,14 +18,19 @@ class ArrayBase:
 
     def __repr__(self) -> str:
         shape: str = f"({self.height}, {self.width})"
-        array: str = np.array2string(
+        array_str: str = np.array2string(
             self.values,
             precision=2,
             suppress_small=True,
-            separator="||",
-            max_line_width=1000
+            separator="|",
+            max_line_width=10000,
+            edgeitems=5
         )
-        return f"shape:\n {shape}\n {array}"
+        if array_str.startswith("[") and array_str.endswith("]"):
+            array_str = array_str[1:-1]
+
+        array_str = array_str.replace("[", "|").replace("]", "|").replace("||", "|")
+        return f"shape:\n {shape}\n {array_str}"
 
     @property
     def size(self) -> str:
