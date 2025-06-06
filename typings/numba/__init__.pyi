@@ -1,7 +1,7 @@
-from collections.abc import Iterable, Callable
+from collections.abc import Callable
 from typing import Any
 
-def jitclass(cls_or_spec: Any|None = None, spec: Iterable[Any] | None = None) -> Any: ...
+
 def njit(*args: Any, **kwargs: Any) -> Callable[..., Any]: ...
 
 class Integer:

@@ -1,8 +1,8 @@
-from numba import njit, prange  # type: ignore
+from numba import njit, prange
 import numpy as np
 from numpy.typing import NDArray
 
-@njit(parallel=True, cache=True)  # type: ignore
+@njit(parallel=True, cache=True)
 def cross_rank_normalized(data: NDArray[np.float32]) -> NDArray[np.float32]:
     n_days, n_cols = data.shape
     result: NDArray[np.float32] = np.empty(shape=(n_days, n_cols), dtype=np.float32)
