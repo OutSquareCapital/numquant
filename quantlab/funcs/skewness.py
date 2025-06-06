@@ -1,32 +1,80 @@
-from numba import njit, prange  # type: ignore
-
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
+from numba.experimental import jitclass
+from numba import int32, float32, njit, prange
 
-@njit(cache=True) # type: ignore
-def compute_skewness(
-    min_length: int,
-    observation_count: float,
-    sum_values: float,
-    sum_values_squared: float,
-    sum_values_cubed: float,
-    consecutive_equal_count: int,
-) -> float:
-    if observation_count >= min_length:
+skewspec = [
+    ("consecutive_equal_count", int32),
+    ("sum_values", float32),
+    ("sum_values_squared", float32),
+    ("compensation_values", float32),
+    ("sum_values_cubed", float32),
+    ("compensation_squared", float32),
+    ("compensation_cubed", float32),
+]
+
+@jitclass(skewspec)
+class SkewValues:
+    def __init__(self) -> None:
+        self.reset()
+
+    def reset(self) -> None:
+        self.consecutive_equal_count: int = 0
+        self.sum_values: float = 0.0
+        self.sum_values_squared: float = 0.0
+        self.sum_values_cubed: float = 0.0
+        self.compensation_values: float = 0.0
+        self.compensation_squared: float = 0.0
+        self.compensation_cubed: float = 0.0
+    def add_skewness_contribution(self, value: float, previous_value: float) -> float:
+        temp: float = value - self.compensation_values
+        total: float = self.sum_values + temp
+        self.compensation_values = total - self.sum_values - temp
+        self.sum_values = total
+
+        temp = value * value - self.compensation_squared
+        total = self.sum_values_squared + temp
+        self.compensation_squared = total - self.sum_values_squared - temp
+        self.sum_values_squared = total
+
+        temp = value * value * value - self.compensation_cubed
+        total = self.sum_values_cubed + temp
+        self.compensation_cubed = total - self.sum_values_cubed - temp
+        self.sum_values_cubed = total
+
+        if value == previous_value:
+            self.consecutive_equal_count += 1
+        else:
+            self.consecutive_equal_count = 1
+        previous_value = value
+        return previous_value
+
+    def remove_skewness_contribution(self, value: float) -> None:
+        temp: float = -value - self.compensation_values
+        total: float = self.sum_values + temp
+        self.compensation_values = total - self.sum_values - temp
+        self.sum_values = total
+
+        temp = -value * value - self.compensation_squared
+        total = self.sum_values_squared + temp
+        self.compensation_squared = total - self.sum_values_squared - temp
+        self.sum_values_squared = total
+
+        temp = -value * value * value - self.compensation_cubed
+        total = self.sum_values_cubed + temp
+        self.compensation_cubed = total - self.sum_values_cubed - temp
+        self.sum_values_cubed = total
+
+    def compute_skewness(self, observation_count: float) -> float:
         total_observations = float(observation_count)
-        mean: float = sum_values / total_observations
-        variance: float = sum_values_squared / total_observations - mean * mean
+        mean: float = self.sum_values / total_observations
+        variance: float = self.sum_values_squared / total_observations - mean * mean
         skewness_numerator: float = (
-            sum_values_cubed / total_observations
+            self.sum_values_cubed / total_observations
             - mean * mean * mean
             - 3 * mean * variance
         )
-
-        if observation_count < 3:
-            return np.nan
-        elif consecutive_equal_count >= observation_count:
-            return 0.0
-        elif variance <= 1e-14:
+        if variance <= 1e-14:
             return np.nan
         else:
             std_dev = np.sqrt(variance)
@@ -35,210 +83,49 @@ def compute_skewness(
                 * skewness_numerator
                 / ((total_observations - 2) * std_dev * std_dev * std_dev)
             )
-    else:
-        return np.nan
 
 
-@njit(cache=True) # type: ignore
-def add_skewness_contribution(
-    value: float,
-    observation_count: int,
-    sum_values: float,
-    sum_values_squared: float,
-    sum_values_cubed: float,
-    compensation_values: float,
-    compensation_squared: float,
-    compensation_cubed: float,
-    consecutive_equal_count: int,
-    previous_value: float,
-) -> tuple[int, float, float, float, float, float, float, int, float]:
-    if value == value:
-        observation_count += 1
-
-        temp: float = value - compensation_values
-        total: float = sum_values + temp
-        compensation_values = total - sum_values - temp
-        sum_values = total
-
-        temp = value * value - compensation_squared
-        total = sum_values_squared + temp
-        compensation_squared = total - sum_values_squared - temp
-        sum_values_squared = total
-
-        temp = value * value * value - compensation_cubed
-        total = sum_values_cubed + temp
-        compensation_cubed = total - sum_values_cubed - temp
-        sum_values_cubed = total
-
-        if value == previous_value:
-            consecutive_equal_count += 1
-        else:
-            consecutive_equal_count = 1
-        previous_value = value
-
-    return (
-        observation_count,
-        sum_values,
-        sum_values_squared,
-        sum_values_cubed,
-        compensation_values,
-        compensation_squared,
-        compensation_cubed,
-        consecutive_equal_count,
-        previous_value,
-    )
-
-
-@njit(cache=True) # type: ignore
-def remove_skewness_contribution(
-    value: float,
-    observation_count: int,
-    sum_values: float,
-    sum_values_squared: float,
-    sum_values_cubed: float,
-    compensation_values: float,
-    compensation_squared: float,
-    compensation_cubed: float,
-) -> tuple[int, float, float, float, float, float, float]:
-    if value == value:
-        observation_count -= 1
-
-        temp: float = -value - compensation_values
-        total: float = sum_values + temp
-        compensation_values = total - sum_values - temp
-        sum_values = total
-
-        temp = -value * value - compensation_squared
-        total = sum_values_squared + temp
-        compensation_squared = total - sum_values_squared - temp
-        sum_values_squared = total
-
-        temp = -value * value * value - compensation_cubed
-        total = sum_values_cubed + temp
-        compensation_cubed = total - sum_values_cubed - temp
-        sum_values_cubed = total
-
-    return (
-        observation_count,
-        sum_values,
-        sum_values_squared,
-        sum_values_cubed,
-        compensation_values,
-        compensation_squared,
-        compensation_cubed,
-    )
-
-
-@njit(cache=True) # type: ignore
+@njit(parallel=True)
 def get_skewness(
-    array: NDArray[np.float32], length: int, min_length: int = 4
+    array: NDArray[np.float32], length: int, min_length: int
 ) -> NDArray[np.float32]:
     num_rows, num_cols = array.shape
     output = np.full(shape=(num_rows, num_cols), fill_value=np.nan, dtype=np.float32)
-
     for col in prange(num_cols):
-        observation_count, sum_values, sum_values_squared, sum_values_cubed = (
-            0,
-            0.0,
-            0.0,
-            0.0,
-        )
-        compensation_values, compensation_squared, compensation_cubed = 0.0, 0.0, 0.0
-        previous_value = array[0, col]
-        consecutive_equal_count = 0
-
+        observation_count: int = 0
+        previous_value: float = array[0, col]
+        col_values = SkewValues()
         for row in range(num_rows):
             start_idx: int = max(0, row - length + 1)
             end_idx: int = row + 1
-
             if row == 0 or start_idx >= row - 1:
-                observation_count, sum_values, sum_values_squared, sum_values_cubed = (
-                    0,
-                    0.0,
-                    0.0,
-                    0.0,
-                )
-                compensation_values, compensation_squared, compensation_cubed = (
-                    0.0,
-                    0.0,
-                    0.0,
-                )
+                observation_count = 0
                 previous_value = array[start_idx, col]
-                consecutive_equal_count = 0
+                col_values.reset()
                 for idx in range(start_idx, end_idx):
-                    (
-                        observation_count,
-                        sum_values,
-                        sum_values_squared,
-                        sum_values_cubed,
-                        compensation_values,
-                        compensation_squared,
-                        compensation_cubed,
-                        consecutive_equal_count,
-                        previous_value,
-                    ) = add_skewness_contribution(
-                        value=array[idx, col],
-                        observation_count=observation_count,
-                        sum_values=sum_values,
-                        sum_values_squared=sum_values_squared,
-                        sum_values_cubed=sum_values_cubed,
-                        compensation_values=compensation_values,
-                        compensation_squared=compensation_squared,
-                        compensation_cubed=compensation_cubed,
-                        consecutive_equal_count=consecutive_equal_count,
-                        previous_value=previous_value,
-                    )
+                    if array[idx, col] == array[idx, col]:
+                        observation_count += 1
+                        previous_value = col_values.add_skewness_contribution(
+                            value=array[idx, col], previous_value=previous_value
+                        )
             else:
                 for idx in range(max(0, row - length), start_idx):
-                    (
-                        observation_count,
-                        sum_values,
-                        sum_values_squared,
-                        sum_values_cubed,
-                        compensation_values,
-                        compensation_squared,
-                        compensation_cubed,
-                    ) = remove_skewness_contribution(
-                        value=array[idx, col],
-                        observation_count=observation_count,
-                        sum_values=sum_values,
-                        sum_values_squared=sum_values_squared,
-                        sum_values_cubed=sum_values_cubed,
-                        compensation_values=compensation_values,
-                        compensation_squared=compensation_squared,
-                        compensation_cubed=compensation_cubed,
+                    if array[idx, col] == array[idx, col]:
+                        observation_count -= 1
+                        col_values.remove_skewness_contribution(value=array[idx, col])
+                if array[row, col] == array[row, col]:
+                    observation_count += 1
+                    previous_value = col_values.add_skewness_contribution(
+                        value=array[row, col], previous_value=previous_value
                     )
-
-                (
-                    observation_count,
-                    sum_values,
-                    sum_values_squared,
-                    sum_values_cubed,
-                    compensation_values,
-                    compensation_squared,
-                    compensation_cubed,
-                    consecutive_equal_count,
-                    previous_value,
-                ) = add_skewness_contribution(
-                    value=array[row, col],
-                    observation_count=observation_count,
-                    sum_values=sum_values,
-                    sum_values_squared=sum_values_squared,
-                    sum_values_cubed=sum_values_cubed,
-                    compensation_values=compensation_values,
-                    compensation_squared=compensation_squared,
-                    compensation_cubed=compensation_cubed,
-                    consecutive_equal_count=consecutive_equal_count,
-                    previous_value=previous_value,
-                )
-
-            output[row, col] = compute_skewness(
-                min_length=min_length,
-                observation_count=observation_count,
-                sum_values=sum_values,
-                sum_values_squared=sum_values_squared,
-                sum_values_cubed=sum_values_cubed,
-                consecutive_equal_count=consecutive_equal_count,
-            )
+            if observation_count >= min_length:
+                if col_values.consecutive_equal_count >= observation_count:
+                    output[row, col] = 0.0
+                else:
+                    output[row, col] = col_values.compute_skewness(
+                        observation_count=observation_count
+                    )
+            else:
+                output[row, col] = np.nan
 
     return output
