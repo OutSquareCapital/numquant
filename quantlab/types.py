@@ -1,5 +1,7 @@
 from enum import Enum, StrEnum
 import numpy as np
+
+
 class Attributes(StrEnum):
     DATA = "data"
     PARENT = "_parent"
