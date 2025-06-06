@@ -1,40 +1,35 @@
-from typing import Self
-import numpy as np
-import polars as pl
-from numpy.typing import NDArray
 from dataclasses import dataclass
+from typing import Self
+
+import numbagg as nbg
+import numpy as np
+from numpy.typing import NDArray
+
 from quantlab.funcs import cross_rank_normalized
 from quantlab.types import Scalars
-import numbagg as nbg
 
 
 @dataclass(slots=True, repr=False)
 class ArrayBase:
     values: NDArray[np.float32]
-    index: pl.Series
-    names: pl.Series
 
     def new(self, data: NDArray[np.float32]) -> Self:
-        return self.__class__(values=data, index=self.index, names=self.names)
+        return self.__class__(values=data)
 
     def __repr__(self) -> str:
-        shape: str = f"({self.height}, {self.width + 1})"
+        shape: str = f"({self.height}, {self.width})"
         array: str = np.array2string(
             self.values,
             precision=2,
             suppress_small=True,
             separator="||",
+            max_line_width=1000
         )
-        idx: str = self.index.__repr__()
-        return f"shape:\n {shape}\n {array}\n index:\n {idx}"
-
-    @property
-    def _bit_size(self) -> int | float:
-        return self.values.nbytes
+        return f"shape:\n {shape}\n {array}"
 
     @property
     def size(self) -> str:
-        byte_size: int | float = self._bit_size
+        byte_size: int | float = self.values.nbytes
         kb: float = 1024
         mb: float = kb * 1024
         gb: float = mb * 1024
@@ -96,9 +91,7 @@ class ArrayBase:
         )
 
     def backfill(self) -> Self:
-        return self.new(
-            data=nbg.bfill(arr=self.values, axis=0, out=self.values)
-        )
+        return self.new(data=nbg.bfill(arr=self.values, axis=0, out=self.values))
 
     def long_bias(self) -> Self:
         return self.new(
