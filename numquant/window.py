@@ -2,7 +2,7 @@ import bottleneck as bn
 import numpy as np
 from numpy.typing import NDArray
 from dataclasses import dataclass
-from numquant.funcs import get_kurtosis, get_skewness
+from numquant.funcs import get_kurtosis, get_skewness, get_mean
 from numquant.interface import ArrayBase
 
 
@@ -62,6 +62,12 @@ class WindowExecutor[T: ArrayBase]:
                 min_count=self._min_len,
                 axis=0,
                 ddof=1,
+            )
+        )
+    def mean_nb(self) -> T:
+        return self._compute(
+            value=get_mean(
+                array=self._values, length=self._len, min_length=self._min_len
             )
         )
 

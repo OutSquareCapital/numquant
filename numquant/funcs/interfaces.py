@@ -8,26 +8,26 @@ from numpy.typing import NDArray
 
 class Signatures(Enum):
     VALUES_32 = [
-        ("multiplier", nb.uint8),
+        ("multiplier", nb.float32),
         ("sum", nb.float32),
         ("compensation", nb.float32),
     ]
     VALUES_64 = [
-        ("multiplier", nb.uint8),
+        ("multiplier", nb.float64),
         ("sum", nb.float64),
         ("compensation", nb.float64),
     ]
-    ROLLING_FUNC = nb.float32[:, :](nb.float32[:, :], nb.int32, nb.int32)
+    ROLLING_FUNC = nb.float32[:, :](nb.float32[:, :], nb.uint8, nb.uint8)
 
 
 class AccumulatorBase:
-    def __init__(self, multiplier: int) -> None:
-        self.multiplier: int = multiplier
+    def __init__(self, multiplier: float) -> None:
+        self.multiplier: float = multiplier
         self.sum: float = 0.0
         self.compensation: float = 0.0
 
     def get_contribution(self, value: float) -> None:
-        temp: float = value - self.compensation
+        temp: float = value**self.multiplier - self.compensation
         total: float = self.sum + temp
         self.compensation = total - self.sum - temp
         self.sum = total
@@ -51,25 +51,25 @@ def get_stat_protocol(
         shape=(num_rows, num_cols), fill_value=np.nan, dtype=np.float32
     )
     for col in nb.prange(num_cols):
-        observation_count: int = 0
-        ...
+        ... # Placeholder for accumulator initialization
         for row in range(num_rows):
             start_idx: int = max(0, row - length + 1)
             end_idx: int = row + 1
-            if row == 0:
+            observation_count: int = 0
+            if row == 0 or start_idx >= row - 1:
                 for idx in range(start_idx, end_idx):
                     if not np.isnan(array[idx, col]):
                         observation_count += 1
-                        ...
+                        ... # Placeholder for adding contribution
             else:
                 for idx in range(max(0, row - length), start_idx):
                     if not np.isnan(array[idx, col]):
                         observation_count -= 1
-                        ...
+                        ... # Placeholder for removing contribution
                 if not np.isnan(array[row, col]):
                     observation_count += 1
-                    ...
+                    ... # Placeholder for adding contribution
 
             if observation_count >= min_length:
-                ...
+                output[row, col] = 1 # Placeholder for actual computation
     return output
