@@ -115,4 +115,4 @@ class ArrayBase:
         return self.new(data=np.where(np.isnan(self.values), median_value, self.values))
 
     def cross_rank(self) -> Self:
-        return self.new(data=cross_rank_normalized(data=self.values))
+        return self.new(data=cross_rank_normalized(array=self.values))

@@ -18,7 +18,6 @@ def jit(
     parallel: bool = False,
     nogil: bool = False,
 ) -> Callable[P, R]: ...
-
 class Type:
     def __call__(self, *args: Any, **kwds: Any) -> Any: ...
 
@@ -35,5 +34,12 @@ class prange(object):
 
 float32 = Float()
 float64 = Float()
+byte = uint8 = Integer()
+uint16 = Integer()
+uint32 = Integer()
+uint64 = Integer()
+
+int8 = Integer()
+int16 = Integer()
 int32 = Integer()
 int64 = Integer()
