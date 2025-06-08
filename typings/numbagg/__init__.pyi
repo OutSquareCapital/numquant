@@ -16,3 +16,20 @@ def bfill(
     out: NDArray[float32] | None = None,
     axis: int = -1,
 ) -> NDArray[float32]: ...
+
+@overload
+def move_mean(
+    arr: NDArray[float64] | NDArray[int32] | NDArray[int64],
+    window: int,
+    min_count: int | None = None,
+    out: NDArray[float64] | None = None,
+    axis: int = -1,
+) -> NDArray[float64]: ...
+@overload
+def move_mean(
+    arr: NDArray[float32],
+    window: int,
+    min_count: int | None = None,
+    out: NDArray[float32] | None = None,
+    axis: int = -1,
+) -> NDArray[float32]: ...
