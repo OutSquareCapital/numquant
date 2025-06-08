@@ -48,21 +48,18 @@ def skewness(
         variance_sum=variance_sum,
         mean_value=mean_value,
     )
-    if variance_value <= 1e-14:
-        return np.nan
-    else:
-        skew_numerator: float = skewness_numerator(
-            observation_count=observation_count,
-            skew_sum=skew_sum,
-            mean_value=mean_value,
-            variance_value=variance_value,
-        )
-        std_dev: float = np.sqrt(variance_value)
-        return (
-            np.sqrt(observation_count * (observation_count - 1))
-            * skew_numerator
-            / ((observation_count - 2) * std_dev**3)
-        )
+    skew_numerator: float = skewness_numerator(
+        observation_count=observation_count,
+        skew_sum=skew_sum,
+        mean_value=mean_value,
+        variance_value=variance_value,
+    )
+    std_dev: float = np.sqrt(variance_value)
+    return (
+        np.sqrt(observation_count * (observation_count - 1))
+        * skew_numerator
+        / ((observation_count - 2) * std_dev**3)
+    )
 
 
 @nb.jit(
@@ -85,25 +82,22 @@ def kurtosis(
         variance_sum=variance_sum,
         mean_value=mean_value,
     )
-    if variance_value <= 1e-14:
-        return np.nan
-    else:
-        skew_numerator: float = skewness_numerator(
-            observation_count=observation_count,
-            mean_value=mean_value,
-            variance_value=variance_value,
-            skew_sum=skew_sum,
-        )
+    skew_numerator: float = skewness_numerator(
+        observation_count=observation_count,
+        mean_value=mean_value,
+        variance_value=variance_value,
+        skew_sum=skew_sum,
+    )
 
-        kurtosis_term: float = (
-            kurtosis_sum / observation_count
-            - mean_value**4
-            - 6 * variance_value * mean_value**2
-            - 4 * skew_numerator * mean_value
-        )
-        return (
-            (observation_count * observation_count - 1.0)
-            * kurtosis_term
-            / (variance_value**2)
-            - 3.0 * ((observation_count - 1.0) ** 2)
-        ) / ((observation_count - 2.0) * (observation_count - 3.0))
+    kurtosis_term: float = (
+        kurtosis_sum / observation_count
+        - mean_value**4
+        - 6 * variance_value * mean_value**2
+        - 4 * skew_numerator * mean_value
+    )
+    return (
+        (observation_count * observation_count - 1.0)
+        * kurtosis_term
+        / (variance_value**2)
+        - 3.0 * ((observation_count - 1.0) ** 2)
+    ) / ((observation_count - 2.0) * (observation_count - 3.0))
