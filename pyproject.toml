@@ -12,7 +12,6 @@ dependencies = [
     "numba>=0.61.2",
     "numbagg>=0.9.0",
     "numpy>=2.2.6",
-    "pandas>=2.3.0",
     "plotly-stubs>=0.0.5",
     "plotly[express]>=6.1.1",
     "polars>=1.30.0",
