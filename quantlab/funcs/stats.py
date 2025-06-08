@@ -49,7 +49,7 @@ def skewness(
         mean_value=mean_value,
     )
     if variance_value <= 1e-14:
-            return np.nan
+        return np.nan
     else:
         skew_numerator: float = skewness_numerator(
             observation_count=observation_count,
@@ -86,7 +86,7 @@ def kurtosis(
         mean_value=mean_value,
     )
     if variance_value <= 1e-14:
-            return np.nan
+        return np.nan
     else:
         skew_numerator: float = skewness_numerator(
             observation_count=observation_count,

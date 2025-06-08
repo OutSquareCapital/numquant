@@ -6,7 +6,6 @@ import numpy as np
 from numpy.typing import NDArray
 
 from quantlab.funcs import cross_rank_normalized
-from quantlab.types import Scalars
 
 
 @dataclass(slots=True, repr=False)
@@ -24,7 +23,7 @@ class ArrayBase:
             suppress_small=True,
             separator="|",
             max_line_width=10000,
-            edgeitems=5
+            edgeitems=5,
         )
         if array_str.startswith("[") and array_str.endswith("]"):
             array_str = array_str[1:-1]
@@ -97,16 +96,6 @@ class ArrayBase:
 
     def backfill(self) -> Self:
         return self.new(data=nbg.bfill(arr=self.values, axis=0, out=self.values))
-
-    def long_bias(self) -> Self:
-        return self.new(
-            data=np.where(self.values > Scalars.ZERO, self.values, Scalars.ZERO)
-        )
-
-    def short_bias(self) -> Self:
-        return self.new(
-            data=np.where(self.values < Scalars.ZERO, self.values, Scalars.ZERO)
-        )
 
     def fill_by_median(self) -> Self:
         median_value: NDArray[np.float32] = np.nanmedian(

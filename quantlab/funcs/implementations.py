@@ -2,8 +2,9 @@ import numba as nb
 import numpy as np
 from numpy.typing import NDArray
 
-from quantlab.funcs.interfaces import Signatures, AccumulatorFloat32, AccumulatorFloat64
+from quantlab.funcs.interfaces import AccumulatorFloat32, AccumulatorFloat64, Signatures
 from quantlab.funcs.stats import kurtosis, skewness
+
 
 @nb.jit(signature_or_function=Signatures.ROLLING_FUNC.value, parallel=True, nogil=True)
 def get_skewness(

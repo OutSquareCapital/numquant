@@ -1,8 +1,10 @@
-import numpy as np
-from numpy.typing import NDArray
-import numba as nb
-from numba.experimental import jitclass
 from enum import Enum
+
+import numba as nb
+import numpy as np
+from numba.experimental import jitclass
+from numpy.typing import NDArray
+
 
 class Signatures(Enum):
     VALUES_32 = [
@@ -15,7 +17,8 @@ class Signatures(Enum):
         ("sum", nb.float64),
         ("compensation", nb.float64),
     ]
-    ROLLING_FUNC =  nb.float32[:, :](nb.float32[:, :], nb.int32, nb.int32)
+    ROLLING_FUNC = nb.float32[:, :](nb.float32[:, :], nb.int32, nb.int32)
+
 
 class AccumulatorBase:
     def __init__(self, multiplier: int) -> None:
@@ -29,19 +32,24 @@ class AccumulatorBase:
         self.compensation = total - self.sum - temp
         self.sum = total
 
+
 @jitclass(spec=Signatures.VALUES_32.value)
 class AccumulatorFloat32(AccumulatorBase):
     pass
+
 
 @jitclass(spec=Signatures.VALUES_64.value)
 class AccumulatorFloat64(AccumulatorBase):
     pass
 
+
 def get_stat_protocol(
     array: NDArray[np.float32], length: int, min_length: int
 ) -> NDArray[np.float32]:
     num_rows, num_cols = array.shape
-    output: NDArray[np.float32] = np.full(shape=(num_rows, num_cols), fill_value=np.nan, dtype=np.float32)
+    output: NDArray[np.float32] = np.full(
+        shape=(num_rows, num_cols), fill_value=np.nan, dtype=np.float32
+    )
     for col in nb.prange(num_cols):
         observation_count: int = 0
         ...
