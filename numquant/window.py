@@ -2,8 +2,8 @@ import bottleneck as bn
 import numpy as np
 from numpy.typing import NDArray
 from dataclasses import dataclass
-from quantlab.funcs import get_kurtosis, get_skewness
-from quantlab.interface import ArrayBase
+from numquant.funcs import get_kurtosis, get_skewness
+from numquant.interface import ArrayBase
 
 
 @dataclass(slots=True)
