@@ -63,18 +63,14 @@ def get_stat_protocol(
         ...
         observation_count: int = 0
         for row in range(num_rows):
-            if row <= 1:
-                if not np.isnan(array[row, col]):
-                    observation_count += 1
+            if not np.isnan(array[row, col]):
+                observation_count += 1
+                ...
+            if row > length:
+                idx: int = row - length
+                if not np.isnan(array[idx, col]):
+                    observation_count -= 1
                     ...
-            else:
-                if row > length:
-                    idx: int = row - length
-                    if not np.isnan(array[idx, col]):
-                        observation_count -= 1
-                        ...
-                if not np.isnan(array[row, col]):
-                    observation_count += 1
             if observation_count >= min_length:
                 output[row, col] = 1
     return output
