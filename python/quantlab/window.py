@@ -4,8 +4,8 @@ import bottleneck as bn
 import numpy as np
 from numpy.typing import NDArray
 
-from numquant.funcs import get_kurtosis, get_mean, get_skewness
-from numquant.interface import ArrayBase
+from python.quantlab.funcs import get_kurtosis, get_mean, get_skewness
+from python.quantlab.interface import ArrayBase
 
 
 @dataclass(slots=True)
