@@ -6,10 +6,10 @@ import numpy as np
 import polars as pl
 from numpy.typing import NDArray
 
-from python.quantlab.aggregate import AggregateExecutor
-from python.quantlab.convert import ConverterExecutor
-from python.quantlab.interface import ArrayBase
-from python.quantlab.window import WindowExecutor
+from src.numquant.aggregate import AggregateExecutor
+from src.numquant.convert import ConverterExecutor
+from src.numquant.interface import ArrayBase
+from src.numquant.window import WindowExecutor
 
 
 @dataclass(slots=True, repr=False)

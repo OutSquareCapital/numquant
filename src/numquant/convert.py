@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from python.quantlab.interface import ArrayBase
+from src.numquant.interface import ArrayBase
 
 
 class ConverterExecutor[T: ArrayBase]:

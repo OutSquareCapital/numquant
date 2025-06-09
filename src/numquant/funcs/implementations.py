@@ -1,8 +1,8 @@
 import numba as nb
 import numpy as np
 from numpy.typing import NDArray
-from python.quantlab.funcs.stats import daily_skew, daily_kurtosis
-from python.quantlab.funcs.interfaces import AccumulatorFloat32, AccumulatorFloat64, Signatures
+from src.numquant.funcs.stats import daily_skew, daily_kurtosis
+from src.numquant.funcs.interfaces import AccumulatorFloat32, AccumulatorFloat64, Signatures
 
 
 @nb.jit(signature_or_function=Signatures.ROLLING_FUNC.value, parallel=True, nogil=True)
