@@ -14,4 +14,4 @@ wheels/
 
 # Added by cargo
 
-/target
+/rust/target

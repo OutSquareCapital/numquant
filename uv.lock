@@ -473,8 +473,8 @@ wheels = [
 
 [[package]]
 name = "numquant"
-version = "0.21"
-source = { virtual = "." }
+version = "0.2"
+source = { editable = "." }
 dependencies = [
     { name = "bn-typed" },
     { name = "bottleneck" },
