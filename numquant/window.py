@@ -1,8 +1,10 @@
+from dataclasses import dataclass
+
 import bottleneck as bn
 import numpy as np
 from numpy.typing import NDArray
-from dataclasses import dataclass
-from numquant.funcs import get_kurtosis, get_skewness, get_mean
+
+from numquant.funcs import get_kurtosis, get_mean, get_skewness
 from numquant.interface import ArrayBase
 
 
@@ -64,6 +66,7 @@ class WindowExecutor[T: ArrayBase]:
                 ddof=1,
             )
         )
+
     def mean_nb(self) -> T:
         return self._compute(
             value=get_mean(

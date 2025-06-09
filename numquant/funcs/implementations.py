@@ -1,7 +1,7 @@
 import numba as nb
 import numpy as np
 from numpy.typing import NDArray
-
+from numquant.funcs.stats import daily_skew, daily_kurtosis
 from numquant.funcs.interfaces import AccumulatorFloat32, AccumulatorFloat64, Signatures
 
 
@@ -15,24 +15,21 @@ def get_mean(
     )
     for col in nb.prange(num_cols):
         mean_accumulator = AccumulatorFloat32(1.0)
+        observation_count: int = 0
         for row in range(num_rows):
-            start_idx: int = max(0, row - length + 1)
-            end_idx: int = row + 1
-            observation_count: int = 0
-            if row == 0 or start_idx >= row - 1:
-                for idx in range(start_idx, end_idx):
-                    if not np.isnan(array[idx, col]):
-                        observation_count += 1
-                        mean_accumulator.get_contribution(value=array[idx, col])
-            else:
-                for idx in range(max(0, row - length), start_idx):
-                    if not np.isnan(array[idx, col]):
-                        observation_count -= 1
-                        mean_accumulator.get_contribution(value=-array[idx, col])
+            if row <= 1:
                 if not np.isnan(array[row, col]):
                     observation_count += 1
-                    mean_accumulator.get_contribution(value=array[row, col])
-
+                    mean_accumulator.add_contribution(value=array[row, col])
+            else:
+                if row > length:
+                    idx: int = row - length
+                    if not np.isnan(array[idx, col]):
+                        observation_count -= 1
+                        mean_accumulator.remove_contribution(value=array[idx, col])
+                if not np.isnan(array[row, col]):
+                    observation_count += 1
+                    mean_accumulator.add_contribution(value=array[row, col])
             if observation_count >= min_length:
                 output[row, col] = mean_accumulator.sum / observation_count
     return output
@@ -50,51 +47,34 @@ def get_skewness(
         mean_accumulator = AccumulatorFloat32(1.0)
         variance_accumulator = AccumulatorFloat32(2.0)
         skew_accumulator = AccumulatorFloat32(3.0)
+        observation_count: int = 0
         for row in range(num_rows):
-            start_idx: int = max(0, row - length + 1)
-            end_idx: int = row + 1
-            observation_count = 0
-            if row == 0 or start_idx >= row - 1:
-                for idx in range(start_idx, end_idx):
-                    val: float = array[idx, col]
-                    if not np.isnan(val):
-                        observation_count += 1
-                        mean_accumulator.get_contribution(value=val)
-                        variance_accumulator.get_contribution(value=val)
-                        skew_accumulator.get_contribution(value=val)
-            else:
-                for idx in range(max(0, row - length), start_idx):
-                    if not np.isnan(array[idx, col]):
-                        observation_count -= 1
-                        mean_accumulator.get_contribution(value=-array[idx, col])
-                        variance_accumulator.get_contribution(value=-array[idx, col])
-                        skew_accumulator.get_contribution(value=-array[idx, col])
+            if row <= 1:
                 if not np.isnan(array[row, col]):
                     observation_count += 1
-                    mean_accumulator.get_contribution(value=array[row, col])
-                    variance_accumulator.get_contribution(value=array[row, col])
-                    skew_accumulator.get_contribution(value=array[row, col])
-
+                    mean_accumulator.add_contribution(value=array[row, col])
+                    variance_accumulator.add_contribution(value=array[row, col])
+                    skew_accumulator.add_contribution(value=array[row, col])
+            else:
+                if row > length:
+                    idx: int = row - length
+                    if not np.isnan(array[idx, col]):
+                        observation_count -= 1
+                        mean_accumulator.remove_contribution(value=array[idx, col])
+                        variance_accumulator.remove_contribution(value=array[idx, col])
+                        skew_accumulator.remove_contribution(value=array[idx, col])
+                if not np.isnan(array[row, col]):
+                    observation_count += 1
+                    mean_accumulator.add_contribution(value=array[row, col])
+                    variance_accumulator.add_contribution(value=array[row, col])
+                    skew_accumulator.add_contribution(value=array[row, col])
             if observation_count >= min_length:
-                mean_value: float = mean_accumulator.sum / observation_count
-                variance_value: float = (
-                    variance_accumulator.sum / observation_count
-                ) - mean_value**2
-                skew_numerator: float = (
-                    skew_accumulator.sum / observation_count
-                    - mean_value**3
-                    - 3 * mean_value * variance_value
+                output[row, col] = daily_skew(
+                    simple_accumulator=mean_accumulator.sum,
+                    squared_accumulator=variance_accumulator.sum,
+                    cubed_accumulator=skew_accumulator.sum,
+                    observation_count=observation_count
                 )
-
-                std_dev: float = np.sqrt(variance_value)
-
-                skewness: float = (
-                    np.sqrt(observation_count * (observation_count - 1))
-                    * skew_numerator
-                    / ((observation_count - 2) * std_dev**3)
-                )
-
-                output[row, col] = skewness
     return output
 
 
@@ -106,61 +86,44 @@ def get_kurtosis(
     output: NDArray[np.float32] = np.full(
         shape=(num_rows, num_cols), fill_value=np.nan, dtype=np.float32
     )
-
     for col in nb.prange(num_cols):
         mean_accumulator = AccumulatorFloat32(1.0)
         variance_accumulator = AccumulatorFloat32(2.0)
         skew_accumulator = AccumulatorFloat32(3.0)
         kurt_accumulator = AccumulatorFloat64(4.0)
+
+        observation_count: int = 0
         for row in range(num_rows):
-            start_idx: int = max(0, row - length + 1)
-            end_idx: int = row + 1
-            observation_count: int = 0
-            if row == 0 or start_idx >= row - 1:
-                for idx in range(start_idx, end_idx):
-                    if not np.isnan(array[idx, col]):
-                        observation_count += 1
-                        mean_accumulator.get_contribution(value=array[idx, col])
-                        variance_accumulator.get_contribution(value=array[idx, col])
-                        skew_accumulator.get_contribution(value=array[idx, col])
-                        kurt_accumulator.get_contribution(value=array[idx, col])
-            else:
-                for idx in range(max(0, row - length), start_idx):
-                    if not np.isnan(array[idx, col]):
-                        observation_count -= 1
-                        mean_accumulator.get_contribution(value=-array[idx, col])
-                        variance_accumulator.get_contribution(value=-array[idx, col])
-                        skew_accumulator.get_contribution(value=-array[idx, col])
-                        kurt_accumulator.get_contribution(value=-array[idx, col])
+            if row <= 1:
                 if not np.isnan(array[row, col]):
                     observation_count += 1
-                    mean_accumulator.get_contribution(value=array[row, col])
-                    variance_accumulator.get_contribution(value=array[row, col])
-                    skew_accumulator.get_contribution(value=array[row, col])
-                    kurt_accumulator.get_contribution(value=array[row, col])
+                    mean_accumulator.add_contribution(value=array[row, col])
+                    variance_accumulator.add_contribution(value=array[row, col])
+                    skew_accumulator.add_contribution(value=array[row, col])
+                    kurt_accumulator.add_contribution(value=array[row, col])
+            else:
+                if row > length:
+                    idx: int = row - length
+                    if not np.isnan(array[idx, col]):
+                        observation_count -= 1
+                        mean_accumulator.remove_contribution(value=array[idx, col])
+                        variance_accumulator.remove_contribution(value=array[idx, col])
+                        skew_accumulator.remove_contribution(value=array[idx, col])
+                        kurt_accumulator.remove_contribution(value=array[idx, col])
+                if not np.isnan(array[row, col]):
+                    observation_count += 1
+                    mean_accumulator.add_contribution(value=array[row, col])
+                    variance_accumulator.add_contribution(value=array[row, col])
+                    skew_accumulator.add_contribution(value=array[row, col])
+                    kurt_accumulator.add_contribution(value=array[row, col])
             if observation_count >= min_length:
-                mean_value: float = mean_accumulator.sum / observation_count
-                variance_value: float = (
-                    variance_accumulator.sum / observation_count
-                ) - mean_value**2
-                skew_numerator: float = (
-                    skew_accumulator.sum / observation_count
-                    - mean_value**3
-                    - 3 * mean_value * variance_value
+                output[row, col] = daily_kurtosis(
+                    simple_accumulator=mean_accumulator.sum,
+                    squared_accumulator=variance_accumulator.sum,
+                    cubed_accumulator=skew_accumulator.sum,
+                    quartic_accumulator=kurt_accumulator.sum,
+                    observation_count=observation_count
                 )
-
-                kurtosis_term: float = (
-                    kurt_accumulator.sum / observation_count
-                    - mean_value**4
-                    - 6 * variance_value * mean_value**2
-                    - 4 * skew_numerator * mean_value
-                )
-                output[row, col] = (
-                    (observation_count * observation_count - 1.0)
-                    * kurtosis_term
-                    / (variance_value**2)
-                    - 3.0 * ((observation_count - 1.0) ** 2)
-                ) / ((observation_count - 2.0) * (observation_count - 3.0))
     return output
 
 

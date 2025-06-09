@@ -23,11 +23,20 @@ class Signatures(Enum):
 class AccumulatorBase:
     def __init__(self, multiplier: float) -> None:
         self.multiplier: float = multiplier
+        self.reset()
+
+    def reset(self) -> None:
         self.sum: float = 0.0
         self.compensation: float = 0.0
 
-    def get_contribution(self, value: float) -> None:
+    def add_contribution(self, value: float) -> None:
         temp: float = value**self.multiplier - self.compensation
+        total: float = self.sum + temp
+        self.compensation = total - self.sum - temp
+        self.sum = total
+
+    def remove_contribution(self, value: float) -> None:
+        temp: float = -(value** self.multiplier) - self.compensation
         total: float = self.sum + temp
         self.compensation = total - self.sum - temp
         self.sum = total
@@ -51,25 +60,21 @@ def get_stat_protocol(
         shape=(num_rows, num_cols), fill_value=np.nan, dtype=np.float32
     )
     for col in nb.prange(num_cols):
-        ... # Placeholder for accumulator initialization
+        ...
+        observation_count: int = 0
         for row in range(num_rows):
-            start_idx: int = max(0, row - length + 1)
-            end_idx: int = row + 1
-            observation_count: int = 0
-            if row == 0 or start_idx >= row - 1:
-                for idx in range(start_idx, end_idx):
-                    if not np.isnan(array[idx, col]):
-                        observation_count += 1
-                        ... # Placeholder for adding contribution
-            else:
-                for idx in range(max(0, row - length), start_idx):
-                    if not np.isnan(array[idx, col]):
-                        observation_count -= 1
-                        ... # Placeholder for removing contribution
+            if row <= 1:
                 if not np.isnan(array[row, col]):
                     observation_count += 1
-                    ... # Placeholder for adding contribution
-
+                    ...
+            else:
+                if row > length:
+                    idx: int = row - length
+                    if not np.isnan(array[idx, col]):
+                        observation_count -= 1
+                        ...
+                if not np.isnan(array[row, col]):
+                    observation_count += 1
             if observation_count >= min_length:
-                output[row, col] = 1 # Placeholder for actual computation
+                output[row, col] = 1
     return output
