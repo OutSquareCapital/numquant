@@ -5,7 +5,7 @@ import numbagg as nbg
 import numpy as np
 from numpy.typing import NDArray
 
-from src.numquant.funcs import cross_rank_normalized
+from src.funcs import cross_rank_normalized
 
 
 @dataclass(slots=True, repr=False)

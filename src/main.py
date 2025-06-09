@@ -6,10 +6,10 @@ import numpy as np
 import polars as pl
 from numpy.typing import NDArray
 
-from src.numquant.aggregate import AggregateExecutor
-from src.numquant.convert import ConverterExecutor
-from src.numquant.interface import ArrayBase
-from src.numquant.window import WindowExecutor
+from src.aggregate import AggregateExecutor
+from src.convert import ConverterExecutor
+from src.interface import ArrayBase
+from src.window import WindowExecutor
 
 
 @dataclass(slots=True, repr=False)

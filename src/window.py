@@ -4,9 +4,8 @@ import bottleneck as bn
 import numpy as np
 from numpy.typing import NDArray
 
-from src.numquant.funcs import get_kurtosis, get_mean, get_skewness
-from src.numquant.interface import ArrayBase
-import src.numquant.numquant as tst
+from src.funcs import get_kurtosis, get_mean, get_skewness
+from src.interface import ArrayBase
 
 
 
@@ -76,12 +75,6 @@ class WindowExecutor[T: ArrayBase]:
             )
         )
 
-    def mean_rs(self) -> T:
-        return self._compute(
-            value=tst.get_stat_protocol(
-                array=self._values, length=self._len, min_length=self._min_len
-            )
-        )
     def skew(self) -> T:
         return self._compute(
             value=get_skewness(

@@ -4,8 +4,8 @@ import bottleneck as bn
 import numpy as np
 from numpy.typing import NDArray
 
-from src.numquant.funcs import get_skewness
-from src.numquant.interface import ArrayBase
+from src.funcs import get_skewness
+from src.interface import ArrayBase
 
 
 @dataclass(slots=True)
