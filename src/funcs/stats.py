@@ -1,7 +1,10 @@
 import numpy as np
 import numba as nb
 
-@nb.jit(signature_or_function=nb.float32(nb.float32, nb.float32, nb.float32, nb.int32), nogil=True)
+@nb.jit(
+    signature_or_function=nb.float32(nb.float32, nb.float32, nb.float32, nb.int32),
+    nogil=True,
+)
 def daily_skew(
     simple_accumulator: float,
     squared_accumulator: float,
@@ -24,7 +27,13 @@ def daily_skew(
         / ((observation_count - 2) * std_dev**3)
     )
 
-@nb.jit(signature_or_function=nb.float32(nb.float32, nb.float32, nb.float32, nb.float64, nb.int32), nogil=True)
+
+@nb.jit(
+    signature_or_function=nb.float32(
+        nb.float32, nb.float32, nb.float32, nb.float64, nb.int32
+    ),
+    nogil=True,
+)
 def daily_kurtosis(
     simple_accumulator: float,
     squared_accumulator: float,

@@ -19,7 +19,6 @@ class Signatures(Enum):
     ]
     ROLLING_FUNC = nb.float32[:, :](nb.float32[:, :], nb.uint8, nb.uint8)
 
-
 class AccumulatorBase:
     def __init__(self, multiplier: float) -> None:
         self.multiplier: float = multiplier

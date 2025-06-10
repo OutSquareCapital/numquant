@@ -159,6 +159,15 @@ wheels = [
 ]
 
 [[package]]
+name = "dill"
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/12/80/630b4b88364e9a8c8c5797f4602d0f76ef820909ee32f0bacb9f90654042/dill-0.4.0.tar.gz", hash = "sha256:0633f1d2df477324f53a895b02c901fb961bdbf65a17122586ea7019292cbcf0", size = 186976, upload-time = "2025-04-16T00:41:48.867Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/50/3d/9373ad9c56321fdab5b41197068e1d8c25883b3fea29dd361f9b55116869/dill-0.4.0-py3-none-any.whl", hash = "sha256:44f54bf6412c2c8464c14e8243eb163690a9800dbe2c367330883b19c7561049", size = 119668, upload-time = "2025-04-16T00:41:47.671Z" },
+]
+
+[[package]]
 name = "executing"
 version = "2.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -320,6 +329,18 @@ wheels = [
 ]
 
 [[package]]
+name = "latexify-py"
+version = "0.4.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "dill" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c1/66/28097e41eb5bcaa6b17557517322cb2ce65c583d8208c91245df40fd8e8e/latexify_py-0.4.4.tar.gz", hash = "sha256:f89274984811fb5b1436c98670814b21502cb34a0becadababcf3e1ec84e426e", size = 29729, upload-time = "2024-12-20T07:02:51.478Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c0/0e/ce3ed3554ba3d37143d5aae1b8733220a29e26306680a67ee53ed373cd17/latexify_py-0.4.4-py3-none-any.whl", hash = "sha256:5aa9c31a5ec7c6d94f67e24334f862f0c576d74a124c36d2712c12fe46f82900", size = 38641, upload-time = "2024-12-20T07:02:49.924Z" },
+]
+
+[[package]]
 name = "llvmlite"
 version = "0.44.0"
 source = { registry = "https://pypi.org/simple" }
@@ -459,6 +480,7 @@ dependencies = [
     { name = "bn-typed" },
     { name = "bottleneck" },
     { name = "ipykernel" },
+    { name = "latexify-py" },
     { name = "matplotlib" },
     { name = "numba" },
     { name = "numbagg" },
@@ -474,6 +496,7 @@ requires-dist = [
     { name = "bn-typed", git = "https://github.com/OutSquareCapital/bn-typed.git" },
     { name = "bottleneck", specifier = ">=1.5.0" },
     { name = "ipykernel", specifier = ">=6.29.5" },
+    { name = "latexify-py", specifier = ">=0.4.4" },
     { name = "matplotlib", specifier = ">=3.10.3" },
     { name = "numba", specifier = ">=0.61.2" },
     { name = "numbagg", specifier = ">=0.9.0" },

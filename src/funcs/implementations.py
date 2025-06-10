@@ -29,7 +29,6 @@ def get_mean(
                 output[row, col] = mean_accumulator.sum / observation_count
     return output
 
-
 @nb.jit(signature_or_function=Signatures.ROLLING_FUNC.value, parallel=True, nogil=True)
 def get_skewness(
     array: NDArray[np.float32], length: int, min_length: int
@@ -61,7 +60,7 @@ def get_skewness(
                     simple_accumulator=mean_accumulator.sum,
                     squared_accumulator=variance_accumulator.sum,
                     cubed_accumulator=skew_accumulator.sum,
-                    observation_count=observation_count
+                    observation_count=observation_count,
                 )
     return output
 
@@ -102,7 +101,7 @@ def get_kurtosis(
                     squared_accumulator=variance_accumulator.sum,
                     cubed_accumulator=skew_accumulator.sum,
                     quartic_accumulator=kurt_accumulator.sum,
-                    observation_count=observation_count
+                    observation_count=observation_count,
                 )
     return output
 
