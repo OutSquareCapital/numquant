@@ -20,7 +20,7 @@ def get_mean(
             if not np.isnan(array[row, col]):
                 observation_count += 1
                 mean_accumulator.add_contribution(value=array[row, col])
-            if row > length:
+            if row >= length:
                 idx: int = row - length
                 if not np.isnan(array[idx, col]):
                     observation_count -= 1
@@ -48,7 +48,7 @@ def get_skewness(
                 mean_accumulator.add_contribution(value=array[row, col])
                 variance_accumulator.add_contribution(value=array[row, col])
                 skew_accumulator.add_contribution(value=array[row, col])
-            if row > length:
+            if row >= length:
                 idx: int = row - length
                 if not np.isnan(array[idx, col]):
                     observation_count -= 1
@@ -87,7 +87,7 @@ def get_kurtosis(
                 variance_accumulator.add_contribution(value=array[row, col])
                 skew_accumulator.add_contribution(value=array[row, col])
                 kurt_accumulator.add_contribution(value=array[row, col])
-            if row > length:
+            if row >= length:
                 idx: int = row - length
                 if not np.isnan(array[idx, col]):
                     observation_count -= 1
