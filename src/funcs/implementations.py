@@ -17,14 +17,15 @@ def get_mean(
         mean_accumulator = AccumulatorFloat32(1.0)
         observation_count: int = 0
         for row in range(num_rows):
-            if not np.isnan(array[row, col]):
+            current: float = array[row, col]
+            if not np.isnan(current):
                 observation_count += 1
-                mean_accumulator.add_contribution(value=array[row, col])
+                mean_accumulator.add_contribution(value=current)
             if row >= length:
-                idx: int = row - length
-                if not np.isnan(array[idx, col]):
+                precedent: float = array[row - length, col]
+                if not np.isnan(precedent):
                     observation_count -= 1
-                    mean_accumulator.remove_contribution(value=array[idx, col])
+                    mean_accumulator.remove_contribution(value=precedent)
             if observation_count >= min_length:
                 output[row, col] = mean_accumulator.sum / observation_count
     return output

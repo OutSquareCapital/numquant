@@ -6,7 +6,7 @@ from numpy.typing import NDArray
 
 from src.funcs import get_kurtosis, get_mean, get_skewness
 from src.interface import ArrayBase
-
+import numbagg as nbg
 
 
 @dataclass(slots=True)
@@ -74,6 +74,11 @@ class WindowExecutor[T: ArrayBase]:
                 array=self._values, length=self._len, min_length=self._min_len
             )
         )
+
+    def mean_nbg(self) -> T:
+        return self._compute(value=nbg.move_mean(
+            self._values, window=self._len, min_count=self._min_len, axis=0
+        ))
 
     def skew(self) -> T:
         return self._compute(

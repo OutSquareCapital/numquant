@@ -19,6 +19,7 @@ class Signatures(Enum):
     ]
     ROLLING_FUNC = nb.float32[:, :](nb.float32[:, :], nb.uint8, nb.uint8)
 
+
 class AccumulatorBase:
     def __init__(self, multiplier: float) -> None:
         self.multiplier: float = multiplier
@@ -35,7 +36,7 @@ class AccumulatorBase:
         self.sum = total
 
     def remove_contribution(self, value: float) -> None:
-        temp: float = -(value** self.multiplier) - self.compensation
+        temp: float = -(value**self.multiplier) - self.compensation
         total: float = self.sum + temp
         self.compensation = total - self.sum - temp
         self.sum = total
@@ -62,12 +63,13 @@ def get_stat_protocol(
         ...
         observation_count: int = 0
         for row in range(num_rows):
-            if not np.isnan(array[row, col]):
+            current: float = array[row, col]
+            if not np.isnan(current):
                 observation_count += 1
                 ...
             if row >= length:
-                idx: int = row - length
-                if not np.isnan(array[idx, col]):
+                precedent: float = array[row - length, col]
+                if not np.isnan(precedent):
                     observation_count -= 1
                     ...
             if observation_count >= min_length:

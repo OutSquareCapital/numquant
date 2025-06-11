@@ -95,7 +95,7 @@ class ArrayBase:
         )
 
     def backfill(self) -> Self:
-        return self.new(data=nbg.bfill(arr=self.values, axis=0, out=self.values))
+        return self.new(data=nbg.bfill(self.values, axis=0))
 
     def fill_by_median(self) -> Self:
         median_value: NDArray[np.float32] = np.nanmedian(
