@@ -10,6 +10,7 @@ dependencies = [
     "ipykernel>=6.29.5",
     "latexify-py>=0.4.4",
     "matplotlib>=3.10.3",
+    "nbg-typed",
     "numba>=0.61.2",
     "numbagg>=0.9.0",
     "numpy>=2.2.6",
@@ -20,3 +21,4 @@ dependencies = [
 ]
 [tool.uv.sources]
 bn-typed = { git = "https://github.com/OutSquareCapital/bn-typed.git" }
+nbg-typed = { git = "https://github.com/OutSquareCapital/nbg-typed.git" }

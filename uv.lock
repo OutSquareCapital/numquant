@@ -397,6 +397,14 @@ wheels = [
 ]
 
 [[package]]
+name = "nbg-typed"
+version = "0.1.1"
+source = { git = "https://github.com/OutSquareCapital/nbg-typed.git#a3827f8b3f5899d148b4b1791242fa86dd1c0a1e" }
+dependencies = [
+    { name = "numpy" },
+]
+
+[[package]]
 name = "nest-asyncio"
 version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -482,6 +490,7 @@ dependencies = [
     { name = "ipykernel" },
     { name = "latexify-py" },
     { name = "matplotlib" },
+    { name = "nbg-typed" },
     { name = "numba" },
     { name = "numbagg" },
     { name = "numpy" },
@@ -498,6 +507,7 @@ requires-dist = [
     { name = "ipykernel", specifier = ">=6.29.5" },
     { name = "latexify-py", specifier = ">=0.4.4" },
     { name = "matplotlib", specifier = ">=3.10.3" },
+    { name = "nbg-typed", git = "https://github.com/OutSquareCapital/nbg-typed.git" },
     { name = "numba", specifier = ">=0.61.2" },
     { name = "numbagg", specifier = ">=0.9.0" },
     { name = "numpy", specifier = ">=2.2.6" },
