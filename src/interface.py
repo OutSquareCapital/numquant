@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Self
 
+import bottleneck as bn
 import numbagg as nbg
 import numpy as np
 from numpy.typing import NDArray
@@ -102,6 +103,10 @@ class ArrayBase:
             a=self.values, axis=0, keepdims=True
         )
         return self.new(data=np.where(np.isnan(self.values), median_value, self.values))
+
+    def fill_nan(self) -> Self:
+        bn.replace(a=self.values, old=np.nan, new=0)
+        return self.new(data=self.values)
 
     def cross_rank(self) -> Self:
         return self.new(data=cross_rank_normalized(array=self.values))
