@@ -1,36 +1,10 @@
 import numba as nb
 import numpy as np
 from numpy.typing import NDArray
-from src.funcs.stats import daily_skew, daily_kurtosis
-from src.funcs.interfaces import AccumulatorFloat32, AccumulatorFloat64, Signatures
+
+from src.funcs.stats import daily_kurtosis, daily_skew
 
 
-@nb.jit(signature_or_function=Signatures.ROLLING_FUNC.value, parallel=True, nogil=True)
-def get_mean(
-    array: NDArray[np.float32], length: int, min_length: int
-) -> NDArray[np.float32]:
-    num_rows, num_cols = array.shape
-    output: NDArray[np.float32] = np.full(
-        shape=(num_rows, num_cols), fill_value=np.nan, dtype=np.float32
-    )
-    for col in nb.prange(num_cols):
-        mean_accumulator = AccumulatorFloat32(1.0)
-        observation_count: int = 0
-        for row in range(num_rows):
-            current: float = array[row, col]
-            if not np.isnan(current):
-                observation_count += 1
-                mean_accumulator.add_contribution(value=current)
-            if row >= length:
-                precedent: float = array[row - length, col]
-                if not np.isnan(precedent):
-                    observation_count -= 1
-                    mean_accumulator.remove_contribution(value=precedent)
-            if observation_count >= min_length:
-                output[row, col] = mean_accumulator.sum / observation_count
-    return output
-
-@nb.jit(signature_or_function=Signatures.ROLLING_FUNC.value, parallel=True, nogil=True)
 def get_skewness(
     array: NDArray[np.float32], length: int, min_length: int
 ) -> NDArray[np.float32]:
@@ -38,35 +12,59 @@ def get_skewness(
     output: NDArray[np.float32] = np.full(
         shape=(num_rows, num_cols), fill_value=np.nan, dtype=np.float32
     )
+
     for col in nb.prange(num_cols):
-        mean_accumulator = AccumulatorFloat32(1.0)
-        variance_accumulator = AccumulatorFloat32(2.0)
-        skew_accumulator = AccumulatorFloat32(3.0)
+        mean_sum: float = 0.0
+        variance_sum: float = 0.0
+        skew_sum: float = 0.0
+        skew_compensation: float = 0.0
         observation_count: int = 0
-        for row in range(num_rows):
-            if not np.isnan(array[row, col]):
+        for row in range(length):
+            current: float = array[row, col]
+            if not np.isnan(current):
                 observation_count += 1
-                mean_accumulator.add_contribution(value=array[row, col])
-                variance_accumulator.add_contribution(value=array[row, col])
-                skew_accumulator.add_contribution(value=array[row, col])
-            if row >= length:
-                idx: int = row - length
-                if not np.isnan(array[idx, col]):
-                    observation_count -= 1
-                    mean_accumulator.remove_contribution(value=array[idx, col])
-                    variance_accumulator.remove_contribution(value=array[idx, col])
-                    skew_accumulator.remove_contribution(value=array[idx, col])
+                mean_sum += current
+                variance_sum += current**2
+                temp: float = current**3 - skew_compensation
+                total: float = skew_sum + temp
+                skew_compensation = total - skew_sum - temp
+                skew_sum = total
             if observation_count >= min_length:
                 output[row, col] = daily_skew(
-                    simple_accumulator=mean_accumulator.sum,
-                    squared_accumulator=variance_accumulator.sum,
-                    cubed_accumulator=skew_accumulator.sum,
+                    simple_accumulator=mean_sum,
+                    squared_accumulator=variance_sum,
+                    cubed_accumulator=skew_sum,
+                    observation_count=observation_count,
+                )
+        for row in range(length, num_rows):
+            current: float = array[row, col]
+            precedent: float = array[row - length, col]
+            if not np.isnan(current):
+                observation_count += 1
+                mean_sum += current
+                variance_sum += current**2
+                temp = current**3 - skew_compensation
+                total = skew_sum + temp
+                skew_compensation = total - skew_sum - temp
+                skew_sum = total
+            if not np.isnan(precedent):
+                observation_count -= 1
+                mean_sum -= precedent
+                variance_sum -= precedent**2
+                temp = -(precedent**3) - skew_compensation
+                total = skew_sum + temp
+                skew_compensation = total - skew_sum - temp
+                skew_sum = total
+            if observation_count >= min_length:
+                output[row, col] = daily_skew(
+                    simple_accumulator=mean_sum,
+                    squared_accumulator=variance_sum,
+                    cubed_accumulator=skew_sum,
                     observation_count=observation_count,
                 )
     return output
 
 
-@nb.jit(signature_or_function=Signatures.ROLLING_FUNC.value, parallel=True, nogil=True)
 def get_kurtosis(
     array: NDArray[np.float32], length: int, min_length: int
 ) -> NDArray[np.float32]:
@@ -74,41 +72,93 @@ def get_kurtosis(
     output: NDArray[np.float32] = np.full(
         shape=(num_rows, num_cols), fill_value=np.nan, dtype=np.float32
     )
-    for col in nb.prange(num_cols):
-        mean_accumulator = AccumulatorFloat32(1.0)
-        variance_accumulator = AccumulatorFloat32(2.0)
-        skew_accumulator = AccumulatorFloat32(3.0)
-        kurt_accumulator = AccumulatorFloat64(4.0)
 
+    for col in nb.prange(num_cols):
+        mean_sum: float = 0.0
+        variance_sum: float = 0.0
+        skew_sum: float = 0.0
+        skew_compensation: float = 0.0
+        kurt_sum: float = 0.0
+        kurt_compensation: float = 0.0
         observation_count: int = 0
-        for row in range(num_rows):
-            if not np.isnan(array[row, col]):
+        for row in range(length):
+            current: float = array[row, col]
+            if not np.isnan(current):
                 observation_count += 1
-                mean_accumulator.add_contribution(value=array[row, col])
-                variance_accumulator.add_contribution(value=array[row, col])
-                skew_accumulator.add_contribution(value=array[row, col])
-                kurt_accumulator.add_contribution(value=array[row, col])
-            if row >= length:
-                idx: int = row - length
-                if not np.isnan(array[idx, col]):
-                    observation_count -= 1
-                    mean_accumulator.remove_contribution(value=array[idx, col])
-                    variance_accumulator.remove_contribution(value=array[idx, col])
-                    skew_accumulator.remove_contribution(value=array[idx, col])
-                    kurt_accumulator.remove_contribution(value=array[idx, col])
+                mean_sum += current
+                variance_sum += current**2
+                temp: float = current**3 - skew_compensation
+                total: float = skew_sum + temp
+                skew_compensation = total - skew_sum - temp
+                skew_sum = total
+                temp = current**4 - kurt_compensation
+                total = kurt_sum + temp
+                kurt_compensation = total - kurt_sum - temp
+                kurt_sum = total
+            if observation_count >= min_length:
+                output[row, col] = daily_skew(
+                    simple_accumulator=mean_sum,
+                    squared_accumulator=variance_sum,
+                    cubed_accumulator=skew_sum,
+                    observation_count=observation_count,
+                )
+        for row in range(length, num_rows):
+            current: float = array[row, col]
+            precedent: float = array[row - length, col]
+            if not np.isnan(current):
+                observation_count += 1
+                mean_sum += current
+                variance_sum += current**2
+                temp = current**3 - skew_compensation
+                total = skew_sum + temp
+                skew_compensation = total - skew_sum - temp
+                skew_sum = total
+                temp = current**4 - kurt_compensation
+                total = kurt_sum + temp
+                kurt_compensation = total - kurt_sum - temp
+                kurt_sum = total
+            if not np.isnan(precedent):
+                observation_count -= 1
+                mean_sum -= precedent
+                variance_sum -= precedent**2
+                temp = -(precedent**3) - skew_compensation
+                total = skew_sum + temp
+                skew_compensation = total - skew_sum - temp
+                skew_sum = total
+                temp = -(precedent**4) - kurt_compensation
+                total = kurt_sum + temp
+                kurt_compensation = total - kurt_sum - temp
+                kurt_sum = total
             if observation_count >= min_length:
                 output[row, col] = daily_kurtosis(
-                    simple_accumulator=mean_accumulator.sum,
-                    squared_accumulator=variance_accumulator.sum,
-                    cubed_accumulator=skew_accumulator.sum,
-                    quartic_accumulator=kurt_accumulator.sum,
+                    simple_accumulator=mean_sum,
+                    squared_accumulator=variance_sum,
+                    cubed_accumulator=skew_sum,
+                    quartic_accumulator=kurt_sum,
                     observation_count=observation_count,
                 )
     return output
 
 
+get_skew = nb.jit(
+    signature_or_function=get_skewness, parallel=False, nogil=True, cache=True
+)
+get_skew_parallel = nb.jit(
+    signature_or_function=get_skewness, parallel=True, nogil=True, cache=True
+)
+get_kurt = nb.jit(
+    signature_or_function=get_kurtosis, parallel=False, nogil=True, cache=True
+)
+get_kurt_parallel = nb.jit(
+    signature_or_function=get_kurtosis, parallel=True, nogil=True, cache=True
+)
+
+
 @nb.jit(
-    signature_or_function=nb.float32[:, :](nb.float32[:, :]), parallel=True, nogil=True
+    signature_or_function=nb.float32[:, :](nb.float32[:, :]),
+    parallel=True,
+    nogil=True,
+    cache=True,
 )
 def cross_rank_normalized(array: NDArray[np.float32]) -> NDArray[np.float32]:
     n_days, n_cols = array.shape

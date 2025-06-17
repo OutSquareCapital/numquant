@@ -4,7 +4,7 @@ import bottleneck as bn
 import numpy as np
 from numpy.typing import NDArray
 
-from src.funcs import get_skewness
+from src.funcs import get_skew
 from src.interface import ArrayBase
 
 
@@ -41,7 +41,7 @@ class AggregateExecutor[T: ArrayBase]:
 
     def skew(self) -> T:
         return self._compute(
-            value=get_skewness(
+            value=get_skew(
                 array=self._values,
                 length=self._parent.height,
                 min_length=self._parent.height,

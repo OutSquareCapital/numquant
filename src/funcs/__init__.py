@@ -1,8 +1,9 @@
-from src.funcs.implementations import cross_rank_normalized, get_skewness, get_kurtosis, get_mean
+from src.funcs.implementations import cross_rank_normalized, get_skew, get_skew_parallel, get_kurt, get_kurt_parallel
 
 __all__: list[str] = [
-    "get_skewness",
-    "get_kurtosis",
-    "cross_rank_normalized",
-    "get_mean"
+    "get_skew",
+    "get_skew_parallel",
+    "get_kurt",
+    "get_kurt_parallel",
+    "cross_rank_normalized"
 ]

@@ -4,9 +4,8 @@ import bottleneck as bn
 import numpy as np
 from numpy.typing import NDArray
 
-from src.funcs import get_kurtosis, get_mean, get_skewness
+from src.funcs import get_kurt, get_skew
 from src.interface import ArrayBase
-import numbagg as nbg
 
 
 @dataclass(slots=True)
@@ -68,28 +67,16 @@ class WindowExecutor[T: ArrayBase]:
             )
         )
 
-    def mean_nb(self) -> T:
-        return self._compute(
-            value=get_mean(
-                array=self._values, length=self._len, min_length=self._min_len
-            )
-        )
-
-    def mean_nbg(self) -> T:
-        return self._compute(value=nbg.move_mean(
-            self._values, window=self._len, min_count=self._min_len, axis=0
-        ))
-
     def skew(self) -> T:
         return self._compute(
-            value=get_skewness(
+            value=get_skew(
                 array=self._values, length=self._len, min_length=self._min_len
             )
         )
 
     def kurt(self) -> T:
         return self._compute(
-            value=get_kurtosis(
+            value=get_kurt(
                 array=self._values, length=self._len, min_length=self._min_len
             )
         )
