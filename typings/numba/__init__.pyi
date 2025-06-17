@@ -1,11 +1,11 @@
 from collections.abc import Callable
-from typing import Any, Literal, ParamSpec, TypeVar, Iterable, overload
+from typing import Any, Literal, ParamSpec, Iterable, overload
 
 P = ParamSpec("P")
-R = TypeVar("R")
+
 @overload
-def jit[R](
-    signature_or_function: str | list[str] | None = None,
+def jit[R: Any](
+    signature_or_function: str | list[str],
     locals: dict[str, Any] = {},
     cache: bool = False,
     pipeline_class: type | None = None,
@@ -20,7 +20,7 @@ def jit[R](
 ) -> Callable[[Callable[P, R]], Callable[P, R]]: # type: ignore
     ...
 @overload
-def jit[R](
+def jit[R: Any](
     signature_or_function: Callable[P, R], # type: ignore
     locals: dict[str, Any] = {},
     cache: bool = False,
@@ -33,9 +33,9 @@ def jit[R](
     inline: Literal["never", "always"] | Callable[..., bool] = "never",
     parallel: bool = False,
     nogil: bool = False,
-) -> Callable[[Callable[P, R]], Callable[P, R]]: # type: ignore
+) -> Callable[P, R]: # type: ignore
     ...
-def guvectorize[R](
+def guvectorize[R: Any](
     signatures: Iterable[Type],
     layout: str,
     /,
