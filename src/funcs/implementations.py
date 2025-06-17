@@ -96,10 +96,11 @@ def get_kurtosis(
                 kurt_compensation = total - kurt_sum - temp
                 kurt_sum = total
             if observation_count >= min_length:
-                output[row, col] = daily_skew(
+                output[row, col] = daily_kurtosis(
                     simple_accumulator=mean_sum,
                     squared_accumulator=variance_sum,
                     cubed_accumulator=skew_sum,
+                    quartic_accumulator=kurt_sum,
                     observation_count=observation_count,
                 )
         for row in range(length, num_rows):
