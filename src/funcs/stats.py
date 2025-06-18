@@ -1,6 +1,7 @@
 import numpy as np
 import numba as nb
 
+
 @nb.jit(
     signature_or_function=nb.float32(nb.float32, nb.float32, nb.float32, nb.int32),
     nogil=True,
