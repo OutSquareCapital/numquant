@@ -1,3 +1,3 @@
-from src.main import Array, Map, read_parquet
+from src.main import Map, read_parquet, col, Expr
 
-__all__: list[str] = ["Array", "read_parquet", "Map"]
+__all__: list[str] = ["read_parquet", "Map", "col", "Expr"]

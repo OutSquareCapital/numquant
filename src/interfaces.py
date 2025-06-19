@@ -1,0 +1,274 @@
+from collections.abc import Callable
+from dataclasses import dataclass
+from functools import partial
+
+import bottleneck as bn
+import numbagg as nbg
+import numpy as np
+from numpy.typing import NDArray
+
+import src.funcs as fn
+
+
+def _wrap_expr(expr: "float|Expr") -> "Expr":
+    if isinstance(expr, Expr):
+        return expr
+    return LiteralExpr(name="literal", _value=expr)
+
+
+@dataclass(slots=True, frozen=True)
+class Expr:
+    name: str
+
+    def execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
+        raise NotImplementedError
+
+    def add(self, by: "float|Expr") -> "BinaryOpExpr":
+        return BinaryOpExpr(
+            name=self.name, _left=self, _right=_wrap_expr(expr=by), _func=np.add
+        )
+
+    def sub(self, by: "float|Expr") -> "BinaryOpExpr":
+        return BinaryOpExpr(
+            name=self.name, _left=self, _right=_wrap_expr(expr=by), _func=np.subtract
+        )
+
+    def mul(self, by: "float|Expr") -> "BinaryOpExpr":
+        return BinaryOpExpr(
+            name=self.name, _left=self, _right=_wrap_expr(expr=by), _func=np.multiply
+        )
+
+    def div(self, by: "float|Expr") -> "BinaryOpExpr":
+        return BinaryOpExpr(
+            name=self.name, _left=self, _right=_wrap_expr(by), _func=np.divide
+        )
+
+    def target(self, by: "float|Expr") -> "BinaryOpExpr":
+        return BinaryOpExpr(
+            name=self.name, _left=self, _right=_wrap_expr(expr=by), _func=np.divide
+        )
+
+    def sign(self) -> "BasicExpr":
+        return BasicExpr(name=self.name, _expr=self, _func=np.sign)
+
+    def abs(self) -> "BasicExpr":
+        return BasicExpr(name=self.name, _expr=self, _func=np.abs)
+
+    def sqrt(self) -> "BasicExpr":
+        return BasicExpr(name=self.name, _expr=self, _func=np.sqrt)
+
+    def clip(self, limit: float) -> "BasicExpr":
+        return BasicExpr(
+            name=self.name,
+            _expr=self,
+            _func=partial(np.clip, a_min=-np.float32(limit), a_max=np.float32(limit)),
+        )
+
+    def backfill(self) -> "BasicExpr":
+        return BasicExpr(
+            name=self.name,
+            _expr=self,
+            _func=partial(nbg.bfill, axis=0),  # type: ignore[call-arg]
+        )
+
+    def fill_by_median(self) -> "FillByMedian":
+        return FillByMedian(name=self.name)
+
+    def fill_nan(self) -> "Replace":
+        return Replace(name=self.name)
+
+    def cross_rank(self) -> "BasicExpr":
+        return BasicExpr(name=self.name, _expr=self, _func=fn.cross_rank_normalized)
+
+    def rolling(self, len: int) -> "Window":
+        return Window(name=self.name, _expr=self, _len=len, _min_len=len)
+
+    @property
+    def agg(self) -> "Aggregate":
+        return Aggregate(name=self.name, _expr=self)
+
+    @property
+    def convert(self) -> "Converter":
+        return Converter(name=self.name, _expr=self)
+
+
+@dataclass(slots=True, frozen=True)
+class Builder:
+    name: str
+    _expr: Expr
+
+    def _build(self, func: Callable[..., NDArray[np.float32]]) -> Expr: ...
+
+
+@dataclass(slots=True, frozen=True)
+class ColExpr(Expr):
+    def execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
+        return data
+
+
+@dataclass(slots=True, frozen=True)
+class LiteralExpr(Expr):
+    _value: float
+
+    def execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
+        return np.array(self._value, dtype=np.float32)
+
+
+@dataclass(slots=True, frozen=True)
+class BasicExpr(Expr):
+    _expr: Expr
+    _func: Callable[..., NDArray[np.float32]]
+
+    def execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
+        expr: NDArray[np.float32] = self._expr.execute(data=data)
+        return self._func(expr)
+
+
+@dataclass(slots=True, frozen=True)
+class BinaryOpExpr(Expr):
+    _left: Expr
+    _right: Expr
+    _func: Callable[..., NDArray[np.float32]]
+
+    def execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
+        left: NDArray[np.float32] = self._left.execute(data=data)
+        right: NDArray[np.float32] = self._right.execute(data=data)
+        return self._func(left, right)
+
+
+@dataclass(slots=True, frozen=True)
+class AggExpr(Expr):
+    _expr: Expr
+    _func: Callable[..., NDArray[np.float32]]
+
+    def execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
+        expr: NDArray[np.float32] = self._expr.execute(data=data)
+        return self._func(expr).reshape((1, -1))
+
+
+@dataclass(slots=True, frozen=True)
+class RollingExpr(Expr):
+    _expr: Expr
+    _len: int
+    _min_len: int
+    _func: Callable[..., NDArray[np.float32]]
+
+    def execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
+        expr: NDArray[np.float32] = self._expr.execute(data=data)
+        return self._func(expr, self._len, self._min_len)
+
+
+@dataclass(slots=True, frozen=True)
+class FillByMedian(Expr):
+    def execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
+        median_value = np.nanmedian(a=data, axis=0, keepdims=True)
+        return np.where(np.isnan(data), median_value, data)
+
+
+@dataclass(slots=True, frozen=True)
+class Replace(Expr):
+    def execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
+        bn.replace(a=data, old=np.nan, new=0)
+        return data
+
+
+@dataclass(slots=True, frozen=True)
+class Aggregate(Builder):
+    def _build(self, func: Callable[..., NDArray[np.float32]]) -> AggExpr:
+        return AggExpr(name=self.name, _expr=self._expr, _func=func)
+
+    def mean(self) -> AggExpr:
+        return self._build(func=partial(bn.nanmean, axis=0))
+
+    def median(self) -> AggExpr:
+        return self._build(func=partial(bn.nanmedian, axis=0))
+
+    def max(self) -> AggExpr:
+        return self._build(func=partial(bn.nanmax, axis=0))
+
+    def min(self) -> AggExpr:
+        return self._build(func=partial(bn.nanmin, axis=0))
+
+    def sum(self) -> AggExpr:
+        return self._build(func=partial(bn.nansum, axis=0))
+
+    def stdev(self) -> AggExpr:
+        return self._build(func=partial(bn.nanstd, axis=0, ddof=1))
+
+
+@dataclass(slots=True, frozen=True)
+class Window(Builder):
+    _len: int
+    _min_len: int
+
+    def _build(self, func: Callable[..., NDArray[np.float32]]) -> RollingExpr:
+        return RollingExpr(
+            name=self.name,
+            _expr=self._expr,
+            _len=self._len,
+            _min_len=self._min_len,
+            _func=func,
+        )
+
+    def mean(self) -> RollingExpr:
+        return self._build(func=partial(bn.move_mean, axis=0))
+
+    def median(self) -> RollingExpr:
+        return self._build(func=partial(bn.move_median, axis=0))
+
+    def max(self) -> RollingExpr:
+        return self._build(func=partial(bn.move_max, axis=0))
+
+    def min(self) -> RollingExpr:
+        return self._build(func=partial(bn.move_min, axis=0))
+
+    def sum(self) -> RollingExpr:
+        return self._build(func=partial(bn.move_sum, axis=0))
+
+    def stdev(self) -> RollingExpr:
+        return self._build(func=partial(bn.move_std, axis=0, ddof=1))
+
+    def skew(self) -> RollingExpr:
+        return self._build(func=fn.get_skew)
+
+    def kurt(self) -> RollingExpr:
+        return self._build(func=fn.get_kurt)
+
+
+@dataclass(slots=True, frozen=True)
+class Converter(Builder):
+    def _build(self, func: Callable[..., NDArray[np.float32]]) -> BasicExpr:
+        return BasicExpr(name=self.name, _expr=self._expr, _func=func)
+
+    def equity_to_log(self) -> BasicExpr:
+        return self._build(func=fn.equity_to_log)
+
+    def equity_to_pct(self) -> BasicExpr:
+        return self._build(func=fn.equity_to_pct)
+
+    def equity_to_equity_log(self) -> BasicExpr:
+        return self._build(func=fn.equity_to_equity_log)
+
+    def equity_log_to_equity(self) -> BasicExpr:
+        return self._build(func=fn.equity_log_to_equity)
+
+    def equity_log_to_log(self) -> BasicExpr:
+        return self._build(func=fn.equity_log_to_log)
+
+    def pct_to_equity(self) -> BasicExpr:
+        return self._build(func=fn.pct_to_equity)
+
+    def pct_to_log(self) -> BasicExpr:
+        return self._build(func=fn.pct_to_log)
+
+    def log_to_pct(self) -> BasicExpr:
+        return self._build(func=fn.log_to_pct)
+
+    def log_to_equity_log(self) -> BasicExpr:
+        return self._build(func=fn.log_to_equity_log)
+
+    def pct_to_equity_log(self) -> BasicExpr:
+        return self._build(func=fn.pct_to_equity_log)
+
+    def shift(self) -> BasicExpr:
+        return self._build(func=fn.shift)
