@@ -17,11 +17,11 @@ def jit[R: Any](
     inline: Literal["never", "always"] | Callable[..., bool] = "never",
     parallel: bool = False,
     nogil: bool = False,
-) -> Callable[[Callable[P, R]], Callable[P, R]]: # type: ignore
+) -> Callable[[Callable[P, R]], Callable[P, R]]:  # type: ignore
     ...
 @overload
 def jit[R: Any](
-    signature_or_function: Callable[P, R], # type: ignore
+    signature_or_function: Callable[P, R],  # type: ignore
     locals: dict[str, Any] = {},
     cache: bool = False,
     pipeline_class: type | None = None,
@@ -33,7 +33,7 @@ def jit[R: Any](
     inline: Literal["never", "always"] | Callable[..., bool] = "never",
     parallel: bool = False,
     nogil: bool = False,
-) -> Callable[P, R]: # type: ignore
+) -> Callable[P, R]:  # type: ignore
     ...
 def guvectorize[R: Any](
     signatures: Iterable[Type],
@@ -42,11 +42,11 @@ def guvectorize[R: Any](
     *,
     identity: Literal[0, 1, "reorderable"] | None = None,
     nopython: bool = True,
-    target: Literal["cpu","parallel", "gpu"] = "cpu",
+    target: Literal["cpu", "parallel", "gpu"] = "cpu",
     forceobj: bool = False,
     cache: bool = False,
     locals: dict[str, Any] = {},
-) -> Callable[[Callable[P, R]], Callable[P, R]]: # type: ignore
+) -> Callable[[Callable[P, R]], Callable[P, R]]:  # type: ignore
     ...
 
 class Type:
@@ -57,15 +57,17 @@ class Array(Type):
 
 class Integer(Type):
     def __getitem__(self, args: Any) -> Array: ...
+
 class NoneType(Type): ...
+
 class Boolean(Type):
     def __getitem__(self, args: Any) -> Array: ...
+
 class Float(Type):
     def __getitem__(self, args: Any) -> Array: ...
 
 class prange(object):
     def __new__(cls, *args: Any) -> range: ...
-
 
 float32 = Float()
 float64 = Float()
