@@ -141,13 +141,35 @@ def get_kurtosis(
     return output
 
 
-get_skew = nb.jit(
+def get_skew(
+    array: NDArray[np.float32], length: int, min_length: int, parallel: bool = False
+) -> NDArray[np.float32]:
+    if parallel:
+        return get_skew_parallel(array=array, length=length, min_length=min_length)
+    else:
+        return get_skew_single_threaded(
+            array=array, length=length, min_length=min_length
+        )
+
+
+def get_kurt(
+    array: NDArray[np.float32], length: int, min_length: int, parallel: bool = False
+) -> NDArray[np.float32]:
+    if parallel:
+        return get_kurt_parallel(array=array, length=length, min_length=min_length)
+    else:
+        return get_kurt_single_threaded(
+            array=array, length=length, min_length=min_length
+        )
+
+
+get_skew_single_threaded = nb.jit(
     signature_or_function=get_skewness, parallel=False, nogil=True, cache=True
 )
 get_skew_parallel = nb.jit(
     signature_or_function=get_skewness, parallel=True, nogil=True, cache=True
 )
-get_kurt = nb.jit(
+get_kurt_single_threaded = nb.jit(
     signature_or_function=get_kurtosis, parallel=False, nogil=True, cache=True
 )
 get_kurt_parallel = nb.jit(

@@ -1,15 +1,36 @@
 from src.funcs.implementations import (
     cross_rank_normalized,
     get_skew,
-    get_skew_parallel,
     get_kurt,
-    get_kurt_parallel,
 )
+from src.funcs.conversions import (
+    equity_log_to_equity,
+    equity_log_to_log,
+    equity_to_equity_log,
+    equity_to_log,
+    equity_to_pct,
+    pct_to_equity,
+    pct_to_equity_log,
+    log_to_equity_log,
+    log_to_pct,
+    pct_to_log,
+    shift,
+)
+
 
 __all__: list[str] = [
     "get_skew",
-    "get_skew_parallel",
     "get_kurt",
-    "get_kurt_parallel",
     "cross_rank_normalized",
+    "equity_log_to_equity",
+    "equity_log_to_log",
+    "equity_to_equity_log",
+    "equity_to_log",
+    "equity_to_pct",
+    "pct_to_equity",
+    "pct_to_equity_log",
+    "log_to_equity_log",
+    "log_to_pct",
+    "pct_to_log",
+    "shift",
 ]
