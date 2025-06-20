@@ -6,8 +6,7 @@ from typing import Self
 import numpy as np
 import polars as pl
 from numpy.typing import NDArray
-
-from src.interfaces import Expr, ColExpr
+from src.expressions import Expr, ColExpr
 
 
 class ColSelector:
@@ -84,7 +83,7 @@ class Map:
         new_data: dict[str, NDArray[np.float32]] = deepcopy(self.data)
         for col, current_exprs in self._exprs.items():
             for e in current_exprs:
-                new_data[col] = e.execute(data=new_data[col])
+                new_data[col] = e._execute(data=new_data[col])  # type: ignore
         return self.__class__(data=new_data, names=self.names)
 
 
