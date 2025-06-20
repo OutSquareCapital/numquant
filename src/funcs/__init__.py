@@ -16,7 +16,7 @@ from src.funcs.conversions import (
     pct_to_log,
     shift,
     fill_by_median,
-    replace
+    replace,
 )
 
 

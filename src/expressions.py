@@ -64,24 +64,15 @@ class Expr:
             _func=partial(np.clip, a_min=-np.float32(limit), a_max=np.float32(limit)),
         )
 
-    def backfill(self) -> "BasicExpr":
-        return BasicExpr(
-            name=self.name,
-            _expr=self,
-            _func=partial(nbg.bfill, axis=0),  # type: ignore[call-arg]
-        )
-
-    def fill_by_median(self) -> "BasicExpr":
-        return BasicExpr(name=self.name, _expr=self, _func=fn.fill_by_median)
-
-    def fill_nan(self) -> "BasicExpr":
-        return BasicExpr(name=self.name, _expr=self, _func=fn.replace)
-
     def cross_rank(self) -> "BasicExpr":
         return BasicExpr(name=self.name, _expr=self, _func=fn.cross_rank_normalized)
 
     def rolling(self, len: int) -> "Window":
         return Window(_expr=self, _len=len, _min_len=len)
+
+    @property
+    def fill(self) -> "Fill":
+        return Fill(_expr=self)
 
     @property
     def agg(self) -> "Aggregate":
@@ -180,6 +171,21 @@ class Aggregate(Builder):
 
     def stdev(self) -> AggExpr:
         return self._build(func=partial(bn.nanstd, axis=0, ddof=1))
+
+
+@dataclass(slots=True, frozen=True)
+class Fill(Builder):
+    def _build(self, func: Callable[..., NDArray[np.float32]]) -> BasicExpr:
+        return BasicExpr(name=self._expr.name, _expr=self._expr, _func=func)
+
+    def by_median(self) -> BasicExpr:
+        return self._build(func=fn.fill_by_median)
+
+    def by_zeros(self) -> BasicExpr:
+        return self._build(func=fn.replace)
+
+    def backward(self) -> BasicExpr:
+        return self._build(func=partial(nbg.bfill, axis=0))  # type: ignore[call-arg]
 
 
 @dataclass(slots=True, frozen=True)
