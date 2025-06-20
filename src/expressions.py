@@ -136,7 +136,7 @@ class AggExpr(Expr):
 
     def _execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
         expr: NDArray[np.float32] = self._expr._execute(data=data)
-        return self._func(expr).reshape((1, -1))
+        return np.broadcast_to(array=self._func(expr), shape=expr.shape)
 
 
 @dataclass(slots=True, frozen=True)

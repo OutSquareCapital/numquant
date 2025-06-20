@@ -5,6 +5,7 @@ import numba as nb
 @nb.jit(
     signature_or_function=nb.float32(nb.float32, nb.float32, nb.float32, nb.int32),
     nogil=True,
+    cache=True,
 )
 def daily_skew(
     simple_accumulator: float,
@@ -34,6 +35,7 @@ def daily_skew(
         nb.float32, nb.float32, nb.float32, nb.float64, nb.int32
     ),
     nogil=True,
+    cache=True,
 )
 def daily_kurtosis(
     simple_accumulator: float,

@@ -1,3 +1,3 @@
-from src.main import Map, read_parquet, col, Expr
+from src.main import LazyFrame, read_parquet, col, Expr
 
-__all__: list[str] = ["read_parquet", "Map", "col", "Expr"]
+__all__: list[str] = ["read_parquet", "LazyFrame", "col", "Expr"]

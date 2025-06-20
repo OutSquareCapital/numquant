@@ -1,12 +1,6 @@
-from enum import Enum
-
 import numba as nb
 import numpy as np
 from numpy.typing import NDArray
-
-
-class Signatures(Enum):
-    ROLLING_FUNC = nb.float32[:, :](nb.float32[:, :], nb.uint8, nb.uint8)
 
 
 def get_stat_protocol(

@@ -20,7 +20,7 @@ class ColSelector:
 col = ColSelector()
 
 
-class Map:
+class LazyFrame:
     __slots__ = ("data", "names", "_exprs")
 
     def __init__(self, data: dict[str, NDArray[np.float32]], names: list[str]) -> None:
@@ -89,7 +89,7 @@ class Map:
 
 def read_parquet(
     file: Path, names_col: str, index_col: str, values_cols: list[str]
-) -> "Map":
+) -> "LazyFrame":
     data: dict[str, NDArray[np.float32]] = {}
     df: pl.DataFrame = pl.read_parquet(source=file)
     values_nb: int = len(values_cols)
@@ -105,4 +105,4 @@ def read_parquet(
         on=names_col, index=index_col, values=values_cols[-1]
     )
     data[values_cols[-1]] = large_df.drop(index_col).to_numpy().astype(dtype=np.float32)
-    return Map(data=data, names=values_cols)
+    return LazyFrame(data=data, names=values_cols)
