@@ -1,5 +1,6 @@
-from numpy.typing import NDArray
+import bottleneck as bn
 import numpy as np
+from numpy.typing import NDArray
 
 
 def _ratios(data: NDArray[np.float32]) -> NDArray[np.float32]:
@@ -111,3 +112,13 @@ def shift(data: NDArray[np.float32]) -> NDArray[np.float32]:
     result[1:, :] = temp[:-1, :]
     result[:1, :] = np.nan
     return result
+
+
+def fill_by_median(data: NDArray[np.float32]) -> NDArray[np.float32]:
+    median_value: NDArray[np.float32] = np.nanmedian(a=data, axis=0, keepdims=True)
+    return np.where(np.isnan(data), median_value, data)
+
+
+def replace(data: NDArray[np.float32]) -> NDArray[np.float32]:
+    bn.replace(a=data, old=np.nan, new=0)
+    return data

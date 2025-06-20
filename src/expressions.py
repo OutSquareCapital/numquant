@@ -71,11 +71,11 @@ class Expr:
             _func=partial(nbg.bfill, axis=0),  # type: ignore[call-arg]
         )
 
-    def fill_by_median(self) -> "FillByMedian":
-        return FillByMedian(name=self.name)
+    def fill_by_median(self) -> "BasicExpr":
+        return BasicExpr(name=self.name, _expr=self, _func=fn.fill_by_median)
 
-    def fill_nan(self) -> "Replace":
-        return Replace(name=self.name)
+    def fill_nan(self) -> "BasicExpr":
+        return BasicExpr(name=self.name, _expr=self, _func=fn.replace)
 
     def cross_rank(self) -> "BasicExpr":
         return BasicExpr(name=self.name, _expr=self, _func=fn.cross_rank_normalized)
@@ -156,20 +156,6 @@ class RollingExpr(Expr):
     def _execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
         expr: NDArray[np.float32] = self._expr._execute(data=data)
         return self._func(expr, self._len, self._min_len)
-
-
-@dataclass(slots=True, frozen=True)
-class FillByMedian(Expr):
-    def _execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
-        median_value = np.nanmedian(a=data, axis=0, keepdims=True)
-        return np.where(np.isnan(data), median_value, data)
-
-
-@dataclass(slots=True, frozen=True)
-class Replace(Expr):
-    def _execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
-        bn.replace(a=data, old=np.nan, new=0)
-        return data
 
 
 @dataclass(slots=True, frozen=True)

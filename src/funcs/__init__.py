@@ -15,6 +15,8 @@ from src.funcs.conversions import (
     log_to_pct,
     pct_to_log,
     shift,
+    fill_by_median,
+    replace
 )
 
 
@@ -33,4 +35,6 @@ __all__: list[str] = [
     "log_to_pct",
     "pct_to_log",
     "shift",
+    "fill_by_median",
+    "replace",
 ]
