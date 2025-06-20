@@ -1,7 +1,23 @@
-from src.funcs.implementations import (
+from src.funcs.main import (
+    move_var,
+    move_mean,
+    move_sum,
+    move_skew,
+    move_kurt,
+    move_std,
+    move_min,
+    move_max,
+    move_median,
+    nanmean,
+    nanmedian,
+    nansum,
+    nanstd,
+    nanvar,
+    nanmax,
+    nanmin,
     cross_rank_normalized,
-    get_skew,
-    get_kurt,
+    ffill,
+    bfill,
 )
 from src.funcs.conversions import (
     equity_log_to_equity,
@@ -21,8 +37,22 @@ from src.funcs.conversions import (
 
 
 __all__: list[str] = [
-    "get_skew",
-    "get_kurt",
+    "move_skew",
+    "move_kurt",
+    "move_mean",
+    "move_std",
+    "move_var",
+    "move_sum",
+    "move_min",
+    "move_max",
+    "move_median",
+    "nanmean",
+    "nanmedian",
+    "nansum",
+    "nanstd",
+    "nanvar",
+    "nanmax",
+    "nanmin",
     "cross_rank_normalized",
     "equity_log_to_equity",
     "equity_log_to_log",
@@ -37,4 +67,6 @@ __all__: list[str] = [
     "shift",
     "fill_by_median",
     "replace",
+    "ffill",
+    "bfill",
 ]

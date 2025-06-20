@@ -3,6 +3,40 @@ import numpy as np
 from numpy.typing import NDArray
 
 from src.funcs.stats import daily_kurtosis, daily_skew
+# TODO: move median, min, max
+
+
+def get_stat_protocol(
+    array: NDArray[np.float32], length: int, min_length: int
+) -> NDArray[np.float32]:
+    num_rows, num_cols = array.shape
+    output: NDArray[np.float32] = np.full(
+        shape=(num_rows, num_cols), fill_value=np.nan, dtype=np.float32
+    )
+
+    for col in nb.prange(num_cols):
+        # initialize accumulators
+        ...
+        observation_count: int = 0
+        for row in range(length):
+            current: float = array[row, col]
+            if not np.isnan(current):
+                observation_count += 1
+                # add contribution to accumulators
+            if observation_count >= min_length:
+                output[row, col]  # = stat()
+        for row in range(length, num_rows):
+            current: float = array[row, col]
+            precedent: float = array[row - length, col]
+            if not np.isnan(current):
+                observation_count += 1
+                # add contribution to accumulators
+            if not np.isnan(precedent):
+                observation_count -= 1
+                # remove contribution from accumulators
+            if observation_count >= min_length:
+                output[row, col]  # = stat()
+    return output
 
 
 def get_skewness(
@@ -141,48 +175,6 @@ def get_kurtosis(
     return output
 
 
-def get_skew(
-    array: NDArray[np.float32], length: int, min_length: int, parallel: bool = False
-) -> NDArray[np.float32]:
-    if parallel:
-        return get_skew_parallel(array=array, length=length, min_length=min_length)
-    else:
-        return get_skew_single_threaded(
-            array=array, length=length, min_length=min_length
-        )
-
-
-def get_kurt(
-    array: NDArray[np.float32], length: int, min_length: int, parallel: bool = False
-) -> NDArray[np.float32]:
-    if parallel:
-        return get_kurt_parallel(array=array, length=length, min_length=min_length)
-    else:
-        return get_kurt_single_threaded(
-            array=array, length=length, min_length=min_length
-        )
-
-
-get_skew_single_threaded = nb.jit(
-    signature_or_function=get_skewness, parallel=False, nogil=True, cache=True
-)
-get_skew_parallel = nb.jit(
-    signature_or_function=get_skewness, parallel=True, nogil=True, cache=True
-)
-get_kurt_single_threaded = nb.jit(
-    signature_or_function=get_kurtosis, parallel=False, nogil=True, cache=True
-)
-get_kurt_parallel = nb.jit(
-    signature_or_function=get_kurtosis, parallel=True, nogil=True, cache=True
-)
-
-
-@nb.jit(
-    signature_or_function=nb.float32[:, :](nb.float32[:, :]),
-    parallel=True,
-    nogil=True,
-    cache=True,
-)
 def cross_rank_normalized(array: NDArray[np.float32]) -> NDArray[np.float32]:
     n_days, n_cols = array.shape
     output: NDArray[np.float32] = np.empty(shape=(n_days, n_cols), dtype=np.float32)
@@ -208,3 +200,23 @@ def cross_rank_normalized(array: NDArray[np.float32]) -> NDArray[np.float32]:
                 ]
                 output[row, col_index] = np.float32(valid_rank * scale - offset)
     return output
+
+
+get_skew_single_threaded = nb.jit(
+    signature_or_function=get_skewness, parallel=False, nogil=True, cache=True
+)
+get_skew_parallel = nb.jit(
+    signature_or_function=get_skewness, parallel=True, nogil=True, cache=True
+)
+get_kurt_single_threaded = nb.jit(
+    signature_or_function=get_kurtosis, parallel=False, nogil=True, cache=True
+)
+get_kurt_parallel = nb.jit(
+    signature_or_function=get_kurtosis, parallel=True, nogil=True, cache=True
+)
+get_cross_rank_single_threaded = nb.jit(
+    signature_or_function=cross_rank_normalized, parallel=False, nogil=True, cache=True
+)
+get_cross_rank_parallel = nb.jit(
+    signature_or_function=cross_rank_normalized, parallel=True, nogil=True, cache=True
+)

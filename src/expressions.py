@@ -1,12 +1,8 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial
-
-import bottleneck as bn
-import numbagg as nbg
 import numpy as np
 from numpy.typing import NDArray
-
 import src.funcs as fn
 
 
@@ -157,22 +153,22 @@ class Aggregate(Builder):
         return AggExpr(name=self._expr.name, _expr=self._expr, _func=func)
 
     def mean(self) -> AggExpr:
-        return self._build(func=partial(bn.nanmean, axis=0))
+        return self._build(func=fn.nanmean)
 
     def median(self) -> AggExpr:
-        return self._build(func=partial(bn.nanmedian, axis=0))
+        return self._build(func=fn.nanmedian)
 
     def max(self) -> AggExpr:
-        return self._build(func=partial(bn.nanmax, axis=0))
+        return self._build(func=fn.nanmax)
 
     def min(self) -> AggExpr:
-        return self._build(func=partial(bn.nanmin, axis=0))
+        return self._build(func=fn.nanmin)
 
     def sum(self) -> AggExpr:
-        return self._build(func=partial(bn.nansum, axis=0))
+        return self._build(func=fn.nansum)
 
     def stdev(self) -> AggExpr:
-        return self._build(func=partial(bn.nanstd, axis=0, ddof=1))
+        return self._build(func=fn.nanstd)
 
 
 @dataclass(slots=True, frozen=True)
@@ -187,7 +183,7 @@ class Fill(Builder):
         return self._build(func=fn.replace)
 
     def backward(self) -> BasicExpr:
-        return self._build(func=partial(nbg.bfill, axis=0))  # type: ignore[call-arg]
+        return self._build(func=fn.bfill)
 
 
 @dataclass(slots=True, frozen=True)
@@ -205,28 +201,28 @@ class Window(Builder):
         )
 
     def mean(self) -> RollingExpr:
-        return self._build(func=partial(bn.move_mean, axis=0))
+        return self._build(func=fn.move_mean)
 
     def median(self) -> RollingExpr:
-        return self._build(func=partial(bn.move_median, axis=0))
+        return self._build(func=fn.move_median)
 
     def max(self) -> RollingExpr:
-        return self._build(func=partial(bn.move_max, axis=0))
+        return self._build(func=fn.move_max)
 
     def min(self) -> RollingExpr:
-        return self._build(func=partial(bn.move_min, axis=0))
+        return self._build(func=fn.move_min)
 
     def sum(self) -> RollingExpr:
-        return self._build(func=partial(bn.move_sum, axis=0))
+        return self._build(func=fn.move_sum)
 
     def stdev(self) -> RollingExpr:
-        return self._build(func=partial(bn.move_std, axis=0, ddof=1))
+        return self._build(func=fn.move_std)
 
     def skew(self) -> RollingExpr:
-        return self._build(func=fn.get_skew)
+        return self._build(func=fn.move_skew)
 
     def kurt(self) -> RollingExpr:
-        return self._build(func=fn.get_kurt)
+        return self._build(func=fn.move_kurt)
 
 
 @dataclass(slots=True, frozen=True)

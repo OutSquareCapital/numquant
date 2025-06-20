@@ -467,8 +467,8 @@ wheels = [
 
 [[package]]
 name = "nbg-typed"
-version = "0.1.2"
-source = { git = "https://github.com/OutSquareCapital/nbg-typed.git#8a3cb81383f3ff520bfc45b921f2965a2515a31a" }
+version = "0.1.2.1"
+source = { git = "https://github.com/OutSquareCapital/nbg-typed.git#6c20140e5d1e34ea8231fac30cf975908aafb0d0" }
 dependencies = [
     { name = "numpy" },
 ]
