@@ -23,29 +23,29 @@ class Expr:
     def _execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
         raise NotImplementedError
 
-    def add(self, by: "float|Expr") -> "BinaryOpExpr":
+    def add(self, other: "float|Expr") -> "BinaryOpExpr":
         return BinaryOpExpr(
-            name=self.name, _left=self, _right=_wrap_expr(expr=by), _func=np.add
+            name=self.name, _left=self, _right=_wrap_expr(expr=other), _func=np.add
         )
 
-    def sub(self, by: "float|Expr") -> "BinaryOpExpr":
+    def sub(self, other: "float|Expr") -> "BinaryOpExpr":
         return BinaryOpExpr(
-            name=self.name, _left=self, _right=_wrap_expr(expr=by), _func=np.subtract
+            name=self.name, _left=self, _right=_wrap_expr(expr=other), _func=np.subtract
         )
 
-    def mul(self, by: "float|Expr") -> "BinaryOpExpr":
+    def mul(self, other: "float|Expr") -> "BinaryOpExpr":
         return BinaryOpExpr(
-            name=self.name, _left=self, _right=_wrap_expr(expr=by), _func=np.multiply
+            name=self.name, _left=self, _right=_wrap_expr(expr=other), _func=np.multiply
         )
 
-    def div(self, by: "float|Expr") -> "BinaryOpExpr":
+    def div(self, other: "float|Expr") -> "BinaryOpExpr":
         return BinaryOpExpr(
-            name=self.name, _left=self, _right=_wrap_expr(expr=by), _func=np.divide
+            name=self.name, _left=self, _right=_wrap_expr(expr=other), _func=np.divide
         )
 
-    def target(self, by: "float|Expr") -> "BinaryOpExpr":
+    def target(self, other: "float|Expr") -> "BinaryOpExpr":
         return BinaryOpExpr(
-            name=self.name, _left=self, _right=_wrap_expr(expr=by), _func=np.divide
+            name=self.name, _left=self, _right=_wrap_expr(expr=other), _func=np.divide
         )
 
     def sign(self) -> "BasicExpr":
@@ -57,11 +57,13 @@ class Expr:
     def sqrt(self) -> "BasicExpr":
         return BasicExpr(name=self.name, _expr=self, _func=np.sqrt)
 
-    def clip(self, limit: float) -> "BasicExpr":
+    def clip(self, lower_bound: float, upper_bound: float) -> "BasicExpr":
         return BasicExpr(
             name=self.name,
             _expr=self,
-            _func=partial(np.clip, a_min=-np.float32(limit), a_max=np.float32(limit)),
+            _func=partial(
+                np.clip, a_min=-np.float32(lower_bound), a_max=np.float32(upper_bound)
+            ),
         )
 
     def cross_rank(self) -> "BasicExpr":
