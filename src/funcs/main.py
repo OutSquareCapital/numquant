@@ -10,6 +10,9 @@ from numpy.typing import NDArray
 import numpy as np
 import bottleneck as bn
 import numbagg as nbg
+import rustats as rs
+
+type Array2D = np.ndarray[tuple[int, int], np.dtype[np.float32]]
 
 
 def cross_rank_normalized(
@@ -94,34 +97,34 @@ def move_mean(
 
 
 def move_median(
-    array: NDArray[np.float32], length: int, min_length: int, parallel: bool = False
+    array: Array2D, length: int, min_length: int, parallel: bool = False
 ) -> NDArray[np.float32]:
     if parallel:
-        raise NotImplementedError
+        return rs.move_median(array=array, length=length, min_length=min_length)
     else:
         return bn.move_median(a=array, window=length, min_count=min_length, axis=0)
 
 
 def move_max(
-    array: NDArray[np.float32], length: int, min_length: int, parallel: bool = False
+    array: Array2D, length: int, min_length: int, parallel: bool = False
 ) -> NDArray[np.float32]:
     if parallel:
-        raise NotImplementedError
+        return rs.move_max(array=array, length=length, min_length=min_length)
     else:
         return bn.move_max(a=array, window=length, min_count=min_length, axis=0)
 
 
 def move_min(
-    array: NDArray[np.float32], length: int, min_length: int, parallel: bool = False
+    array: Array2D, length: int, min_length: int, parallel: bool = False
 ) -> NDArray[np.float32]:
     if parallel:
-        raise NotImplementedError
+        return rs.move_min(array=array, length=length, min_length=min_length)
     else:
         return bn.move_min(a=array, window=length, min_count=min_length, axis=0)
 
 
 def move_sum(
-    array: NDArray[np.float32], length: int, min_length: int, parallel: bool = False
+    array: Array2D, length: int, min_length: int, parallel: bool = False
 ) -> NDArray[np.float32]:
     if parallel:
         return nbg.move_sum(array, window=length, min_count=min_length, axis=0)

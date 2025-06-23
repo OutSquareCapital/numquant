@@ -566,9 +566,11 @@ dependencies = [
     { name = "numpy" },
     { name = "pandas" },
     { name = "plotly" },
+    { name = "plotly-stubs" },
     { name = "polars" },
     { name = "pyright" },
     { name = "ruff" },
+    { name = "rustats" },
 ]
 
 [package.metadata]
@@ -585,9 +587,11 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.2.6" },
     { name = "pandas", specifier = ">=2.3.0" },
     { name = "plotly", specifier = ">=6.1.2" },
+    { name = "plotly-stubs", specifier = ">=0.0.5" },
     { name = "polars", specifier = ">=1.30.0" },
     { name = "pyright", specifier = ">=1.1.401" },
     { name = "ruff", specifier = ">=0.11.12" },
+    { name = "rustats", git = "https://github.com/OutSquareCapital/rustats.git" },
 ]
 
 [[package]]
@@ -700,6 +704,15 @@ wheels = [
 ]
 
 [[package]]
+name = "plotly-stubs"
+version = "0.0.5"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/15/c1/3448098574d0bd352f157081137aa75e595466875361b69ad32b3e9f49e2/plotly_stubs-0.0.5.tar.gz", hash = "sha256:1f373acfd137a09b45a6e68adec0406c62347b5114b5f8f5529a27c0d3e418c5", size = 45908, upload-time = "2025-03-20T07:39:08.716Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/31/02/f66f264c7cfc11eacddd5304b89fdf21f298260024f976e9232836bba163/plotly_stubs-0.0.5-py3-none-any.whl", hash = "sha256:2db5c784835e48aa7cd70165eb6ce1880d5fd149a32064182e3afe5d28e3f1f3", size = 92780, upload-time = "2025-03-20T07:39:06.721Z" },
+]
+
+[[package]]
 name = "polars"
 version = "1.31.0"
 source = { registry = "https://pypi.org/simple" }
@@ -769,11 +782,11 @@ wheels = [
 
 [[package]]
 name = "pygments"
-version = "2.19.1"
+version = "2.19.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/7c/2d/c3338d48ea6cc0feb8446d8e6937e1408088a72a39937982cc6111d17f84/pygments-2.19.1.tar.gz", hash = "sha256:61c16d2a8576dc0649d9f39e089b5f02bcd27fba10d8fb4dcc28173f7a45151f", size = 4968581, upload-time = "2025-01-06T17:26:30.443Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b0/77/a5b8c569bf593b0140bde72ea885a803b82086995367bf2037de0159d924/pygments-2.19.2.tar.gz", hash = "sha256:636cb2477cec7f8952536970bc533bc43743542f70392ae026374600add5b887", size = 4968631, upload-time = "2025-06-21T13:39:12.283Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8a/0b/9fcc47d19c48b59121088dd6da2488a49d5f72dacf8262e2790a1d2c7d15/pygments-2.19.1-py3-none-any.whl", hash = "sha256:9ea1544ad55cecf4b8242fab6dd35a93bbce657034b0611ee383099054ab6d8c", size = 1225293, upload-time = "2025-01-06T17:26:25.553Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/21/705964c7812476f378728bdf590ca4b771ec72385c533964653c68e86bdc/pygments-2.19.2-py3-none-any.whl", hash = "sha256:86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b", size = 1225217, upload-time = "2025-06-21T13:39:07.939Z" },
 ]
 
 [[package]]
@@ -930,6 +943,14 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/6a/ef/b960ab4818f90ff59e571d03c3f992828d4683561095e80f9ef31f3d58b7/ruff-0.12.0-py3-none-win32.whl", hash = "sha256:7162a4c816f8d1555eb195c46ae0bd819834d2a3f18f98cc63819a7b46f474fb", size = 10525289, upload-time = "2025-06-17T15:19:19.688Z" },
     { url = "https://files.pythonhosted.org/packages/34/93/8b16034d493ef958a500f17cda3496c63a537ce9d5a6479feec9558f1695/ruff-0.12.0-py3-none-win_amd64.whl", hash = "sha256:d00b7a157b8fb6d3827b49d3324da34a1e3f93492c1f97b08e222ad7e9b291e0", size = 11598311, upload-time = "2025-06-17T15:19:21.785Z" },
     { url = "https://files.pythonhosted.org/packages/d0/33/4d3e79e4a84533d6cd526bfb42c020a23256ae5e4265d858bd1287831f7d/ruff-0.12.0-py3-none-win_arm64.whl", hash = "sha256:8cd24580405ad8c1cc64d61725bca091d6b6da7eb3d36f72cc605467069d7e8b", size = 10724946, upload-time = "2025-06-17T15:19:23.952Z" },
+]
+
+[[package]]
+name = "rustats"
+version = "0.1.256"
+source = { git = "https://github.com/OutSquareCapital/rustats.git#128131dae733c675fca6da4700996cd5cc1459f9" }
+dependencies = [
+    { name = "numpy" },
 ]
 
 [[package]]

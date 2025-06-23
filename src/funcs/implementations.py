@@ -3,7 +3,6 @@ import numpy as np
 from numpy.typing import NDArray
 
 from src.funcs.stats import daily_kurtosis, daily_skew
-# TODO: move median, min, max
 
 
 def get_stat_protocol(
@@ -115,6 +114,7 @@ def get_kurtosis(
         kurt_sum: float = 0.0
         kurt_compensation: float = 0.0
         observation_count: int = 0
+
         for row in range(length):
             current: float = array[row, col]
             if not np.isnan(current):
