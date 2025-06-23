@@ -12,6 +12,7 @@ from src.funcs.implementations import (
 # NOTE: Rustats is more performant for small arrays, but numbagg is better for bigger.
 # seems like the threshold is around 1 mio cells, row or column don't matter.
 
+#TODO: replace numbagg aggregation functions with rustats
 
 def cross_rank_normalized(
     array: NDArray[np.float32], parallel: bool = False
@@ -158,6 +159,15 @@ def move_kurt(
         )
     else:
         return rs.move_kurtosis(array=array, length=length, min_length=min_length)
+
+
+def move_rank(
+    array: NDArray[np.float32], length: int, min_length: int, parallel: bool = False
+) -> NDArray[np.float32]:
+    if parallel:
+        return rs.move_rank(array=array, length=length, min_length=min_length)
+    else:
+        return bn.move_rank(a=array, window=length, min_count=min_length, axis=0)
 
 
 def bfill(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
