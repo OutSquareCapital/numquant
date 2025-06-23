@@ -1,6 +1,7 @@
 import bottleneck as bn
 import numpy as np
 from numpy.typing import NDArray
+import numbagg as nbg
 
 
 def _ratios(data: NDArray[np.float32]) -> NDArray[np.float32]:
@@ -122,3 +123,17 @@ def fill_by_median(data: NDArray[np.float32]) -> NDArray[np.float32]:
 def replace(data: NDArray[np.float32]) -> NDArray[np.float32]:
     bn.replace(a=data, old=np.nan, new=0)
     return data
+
+
+def bfill(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
+    if parallel:
+        return nbg.bfill(array, axis=0)
+    else:
+        return bn.push(a=array[..., :-1], axis=0)
+
+
+def ffill(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
+    if parallel:
+        return nbg.ffill(array, axis=0)
+    else:
+        return bn.push(a=array, axis=0)

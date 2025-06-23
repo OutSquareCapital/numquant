@@ -3,7 +3,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 
-def cross_rank_normalized(array: NDArray[np.float32]) -> NDArray[np.float32]:
+def _cross_rank_normalized(array: NDArray[np.float32]) -> NDArray[np.float32]:
     n_days, n_cols = array.shape
     output: NDArray[np.float32] = np.empty(shape=(n_days, n_cols), dtype=np.float32)
     offset = np.float32(1.0)
@@ -31,8 +31,17 @@ def cross_rank_normalized(array: NDArray[np.float32]) -> NDArray[np.float32]:
 
 
 get_cross_rank_single_threaded = nb.jit(
-    signature_or_function=cross_rank_normalized, parallel=False, nogil=True, cache=True
+    signature_or_function=_cross_rank_normalized, parallel=False, nogil=True, cache=True
 )
 get_cross_rank_parallel = nb.jit(
-    signature_or_function=cross_rank_normalized, parallel=True, nogil=True, cache=True
+    signature_or_function=_cross_rank_normalized, parallel=True, nogil=True, cache=True
 )
+
+
+def cross_rank_normalized(
+    array: NDArray[np.float32], parallel: bool = False
+) -> NDArray[np.float32]:
+    if parallel:
+        return get_cross_rank_parallel(array=array)
+    else:
+        return get_cross_rank_single_threaded(array=array)

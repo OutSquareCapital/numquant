@@ -224,6 +224,12 @@ class Window(Builder):
     def kurt(self) -> RollingExpr:
         return self._build(func=fn.move_kurt)
 
+    def var(self) -> RollingExpr:
+        return self._build(func=fn.move_var)
+
+    def rank(self) -> RollingExpr:
+        return self._build(func=fn.move_rank)
+
 
 @dataclass(slots=True, frozen=True)
 class Converter(Builder):

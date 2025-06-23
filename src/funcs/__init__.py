@@ -1,4 +1,6 @@
-from src.funcs.main import (
+from src.funcs.main import nanmean, nanmedian, nansum, nanstd, nanvar, nanmax, nanmin
+from src.funcs.horizontal import cross_rank_normalized
+from src.funcs.moving import (
     move_var,
     move_mean,
     move_sum,
@@ -8,16 +10,7 @@ from src.funcs.main import (
     move_min,
     move_max,
     move_median,
-    nanmean,
-    nanmedian,
-    nansum,
-    nanstd,
-    nanvar,
-    nanmax,
-    nanmin,
-    cross_rank_normalized,
-    ffill,
-    bfill,
+    move_rank,
 )
 from src.funcs.conversions import (
     equity_log_to_equity,
@@ -33,6 +26,8 @@ from src.funcs.conversions import (
     shift,
     fill_by_median,
     replace,
+    ffill,
+    bfill,
 )
 
 
@@ -46,6 +41,7 @@ __all__: list[str] = [
     "move_min",
     "move_max",
     "move_median",
+    "move_rank",
     "nanmean",
     "nanmedian",
     "nansum",
