@@ -34,57 +34,47 @@ def nanmean(
 
 
 def nanmedian(
-    array: NDArray[np.float32], axis: int = 0, parallel: bool = False
+    array: NDArray[np.float32], parallel: bool = False
 ) -> NDArray[np.float32]:
     if parallel:
-        return nbg.nanmedian(array, axis=axis)
+        return nbg.nanmedian(array, axis=0)
     else:
-        return bn.nanmedian(a=array, axis=axis)
+        return bn.nanmedian(a=array, axis=0)
 
 
-def nanmax(
-    array: NDArray[np.float32], axis: int = 0, parallel: bool = False
-) -> NDArray[np.float32]:
+def nanmax(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
     if parallel:
-        return nbg.nanmax(array, axis=axis)
+        return nbg.nanmax(array, axis=0)
     else:
-        return bn.nanmax(a=array, axis=axis)
+        return bn.nanmax(a=array, axis=0)
 
 
-def nanmin(
-    array: NDArray[np.float32], axis: int = 0, parallel: bool = False
-) -> NDArray[np.float32]:
+def nanmin(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
     if parallel:
-        return nbg.nanmin(array, axis=axis)
+        return nbg.nanmin(array, axis=0)
     else:
-        return bn.nanmin(a=array, axis=axis)
+        return bn.nanmin(a=array, axis=0)
 
 
-def nansum(
-    array: NDArray[np.float32], axis: int = 0, parallel: bool = False
-) -> NDArray[np.float32]:
+def nansum(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
     if parallel:
-        return nbg.nansum(array, axis=axis)
+        return nbg.nansum(array, axis=0)
     else:
-        return bn.nansum(a=array, axis=axis)
+        return bn.nansum(a=array, axis=0)
 
 
-def nanstd(
-    array: NDArray[np.float32], axis: int = 0, parallel: bool = False
-) -> NDArray[np.float32]:
+def nanstd(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
     if parallel:
-        return nbg.nanstd(array, axis=axis, ddof=1)
+        return nbg.nanstd(array, axis=0, ddof=1)
     else:
-        return bn.nanstd(a=array, axis=axis, ddof=1)
+        return bn.nanstd(a=array, axis=0, ddof=1)
 
 
-def nanvar(
-    array: NDArray[np.float32], axis: int = 0, parallel: bool = False
-) -> NDArray[np.float32]:
+def nanvar(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
     if parallel:
-        return nbg.nanvar(array, axis=axis, ddof=1)
+        return nbg.nanvar(array, axis=0, ddof=1)
     else:
-        return bn.nanvar(a=array, axis=axis, ddof=1)
+        return bn.nanvar(a=array, axis=0, ddof=1)
 
 
 def move_mean(
@@ -172,21 +162,15 @@ def move_kurt(
         )
 
 
-def bfill(
-    array: NDArray[np.float32], axis: int = 0, parallel: bool = False
-) -> NDArray[np.float32]:
+def bfill(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
     if parallel:
-        return nbg.bfill(array, axis=axis)
+        return nbg.bfill(array, axis=0)
     else:
-        return bn.push(
-            a=array[..., ::-1], axis=axis
-        )  # TODO: check if this works as expected
+        return bn.push(a=array[..., :-1], axis=0)
 
 
-def ffill(
-    array: NDArray[np.float32], axis: int = 0, parallel: bool = False
-) -> NDArray[np.float32]:
+def ffill(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
     if parallel:
-        return nbg.ffill(array, axis=axis)
+        return nbg.ffill(array, axis=0)
     else:
-        return bn.push(a=array, axis=axis)
+        return bn.push(a=array, axis=0)
