@@ -1,5 +1,15 @@
-from src.funcs.main import nanmean, nanmedian, nansum, nanstd, nanvar, nanmax, nanmin
-from src.funcs.horizontal import cross_rank_normalized
+from src.funcs.main import (
+    nanmean,
+    nanmedian,
+    nansum,
+    nanstd,
+    nanvar,
+    nanmax,
+    nanmin,
+    nanrank,
+    nanskew,
+    nankurt
+)
 from src.funcs.moving import (
     move_var,
     move_mean,
@@ -49,7 +59,9 @@ __all__: list[str] = [
     "nanvar",
     "nanmax",
     "nanmin",
-    "cross_rank_normalized",
+    "nanrank",
+    "nanskew",
+    "nankurt",
     "equity_log_to_equity",
     "equity_log_to_log",
     "equity_to_equity_log",

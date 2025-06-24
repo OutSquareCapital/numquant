@@ -10,7 +10,7 @@ from numpy.typing import NDArray
 
 
 def nanmean(
-    array: NDArray[np.float32], axis: int = 0, parallel: bool = False
+    array: NDArray[np.float32], axis: int, parallel: bool = False
 ) -> NDArray[np.float32]:
     if parallel:
         return nbg.nanmean(array, axis=axis)
@@ -19,44 +19,80 @@ def nanmean(
 
 
 def nanmedian(
-    array: NDArray[np.float32], parallel: bool = False
+    array: NDArray[np.float32], axis: int, parallel: bool = False
 ) -> NDArray[np.float32]:
     if parallel:
-        return nbg.nanmedian(array, axis=0)
+        return nbg.nanmedian(array, axis=axis)
     else:
-        return bn.nanmedian(a=array, axis=0)
+        return bn.nanmedian(a=array, axis=axis)
 
 
-def nanmax(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
+def nanmax(
+    array: NDArray[np.float32], axis: int, parallel: bool = False
+) -> NDArray[np.float32]:
     if parallel:
-        return nbg.nanmax(array, axis=0)
+        return nbg.nanmax(array, axis=axis)
     else:
-        return bn.nanmax(a=array, axis=0)
+        return bn.nanmax(a=array, axis=axis)
 
 
-def nanmin(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
+def nanmin(
+    array: NDArray[np.float32], axis: int, parallel: bool = False
+) -> NDArray[np.float32]:
     if parallel:
-        return nbg.nanmin(array, axis=0)
+        return nbg.nanmin(array, axis=axis)
     else:
-        return bn.nanmin(a=array, axis=0)
+        return bn.nanmin(a=array, axis=axis)
 
 
-def nansum(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
+def nansum(
+    array: NDArray[np.float32], axis: int, parallel: bool = False
+) -> NDArray[np.float32]:
     if parallel:
-        return nbg.nansum(array, axis=0)
+        return nbg.nansum(array, axis=axis)
     else:
-        return bn.nansum(a=array, axis=0)
+        return bn.nansum(a=array, axis=axis)
 
 
-def nanstd(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
+def nanstd(
+    array: NDArray[np.float32], axis: int, parallel: bool = False
+) -> NDArray[np.float32]:
     if parallel:
-        return nbg.nanstd(array, axis=0, ddof=1)
+        return nbg.nanstd(array, axis=axis, ddof=1)
     else:
-        return bn.nanstd(a=array, axis=0, ddof=1)
+        return bn.nanstd(a=array, axis=axis, ddof=1)
 
 
-def nanvar(array: NDArray[np.float32], parallel: bool = False) -> NDArray[np.float32]:
+def nanvar(
+    array: NDArray[np.float32], axis: int, parallel: bool = False
+) -> NDArray[np.float32]:
     if parallel:
-        return nbg.nanvar(array, axis=0, ddof=1)
+        return nbg.nanvar(array, axis=axis, ddof=1)
     else:
-        return bn.nanvar(a=array, axis=0, ddof=1)
+        return bn.nanvar(a=array, axis=axis, ddof=1)
+
+
+#TODO: implement nanrank, bottleneck is not normalized, and doesn't reduce so conflict with expressions.
+def nanrank(
+    array: NDArray[np.float32], axis: int, parallel: bool = False
+) -> NDArray[np.float32]:
+    if parallel:
+        raise NotImplementedError
+    else:
+        raise NotImplementedError
+    
+def nanskew(
+    array: NDArray[np.float32], axis: int, parallel: bool = False
+) -> NDArray[np.float32]:
+    if parallel:
+        raise NotImplementedError
+    else:
+        raise NotImplementedError
+    
+def nankurt(
+    array: NDArray[np.float32], axis: int, parallel: bool = False
+) -> NDArray[np.float32]:
+    if parallel:
+        raise NotImplementedError
+    else:
+        raise NotImplementedError

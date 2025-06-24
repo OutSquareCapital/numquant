@@ -62,19 +62,20 @@ class Expr:
             ),
         )
 
-    def cross_rank(self) -> "BasicExpr":
-        return BasicExpr(name=self.name, _expr=self, _func=fn.cross_rank_normalized)
-
     def rolling(self, len: int) -> "Window":
         return Window(_expr=self, _len=len, _min_len=len)
 
     @property
     def fill(self) -> "Fill":
         return Fill(_expr=self)
+    
+    @property
+    def horizontal(self) -> "Aggregate":
+        return Aggregate(_expr=self, _horizontal=True)
 
     @property
-    def agg(self) -> "Aggregate":
-        return Aggregate(_expr=self)
+    def vertical(self) -> "Aggregate":
+        return Aggregate(_expr=self, _horizontal=False)
 
     @property
     def convert(self) -> "Converter":
@@ -128,11 +129,17 @@ class BinaryOpExpr(Expr):
 @dataclass(slots=True, frozen=True)
 class AggExpr(Expr):
     _expr: Expr
-    _func: Callable[..., NDArray[np.float32]]
+    _func: Callable[[NDArray[np.float32], int], NDArray[np.float32]]
+    _horizontal: bool
 
     def _execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
         expr: NDArray[np.float32] = self._expr._execute(data=data)
-        return np.broadcast_to(array=self._func(expr), shape=expr.shape)
+        if self._horizontal:
+            return np.broadcast_to(
+                array=self._func(expr, 1)[:, np.newaxis], shape=expr.shape
+            )
+        else:
+            return np.broadcast_to(array=self._func(expr, 0), shape=expr.shape)
 
 
 @dataclass(slots=True, frozen=True)
@@ -149,8 +156,12 @@ class RollingExpr(Expr):
 
 @dataclass(slots=True, frozen=True)
 class Aggregate(Builder):
+    _horizontal: bool
+
     def _build(self, func: Callable[..., NDArray[np.float32]]) -> AggExpr:
-        return AggExpr(name=self._expr.name, _expr=self._expr, _func=func)
+        return AggExpr(
+            name=self._expr.name, _expr=self._expr, _func=func, _horizontal=self._horizontal
+        )
 
     def mean(self) -> AggExpr:
         return self._build(func=fn.nanmean)
@@ -169,6 +180,18 @@ class Aggregate(Builder):
 
     def stdev(self) -> AggExpr:
         return self._build(func=fn.nanstd)
+
+    def var(self) -> AggExpr:
+        return self._build(func=fn.nanvar)
+
+    def rank(self) -> AggExpr:
+        return self._build(func=fn.nanrank)
+    
+    def skew(self) -> AggExpr:
+        return self._build(func=fn.nanskew)
+    
+    def kurt(self) -> AggExpr:
+        return self._build(func=fn.nankurt)
 
 
 @dataclass(slots=True, frozen=True)
