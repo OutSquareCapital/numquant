@@ -8,7 +8,7 @@ from src.funcs.main import (
     nanmin,
     nanrank,
     nanskew,
-    nankurt
+    nankurt,
 )
 from src.funcs.moving import (
     move_var,

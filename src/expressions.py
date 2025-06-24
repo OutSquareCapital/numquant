@@ -68,7 +68,7 @@ class Expr:
     @property
     def fill(self) -> "Fill":
         return Fill(_expr=self)
-    
+
     @property
     def horizontal(self) -> "Aggregate":
         return Aggregate(_expr=self, _horizontal=True)
@@ -160,7 +160,10 @@ class Aggregate(Builder):
 
     def _build(self, func: Callable[..., NDArray[np.float32]]) -> AggExpr:
         return AggExpr(
-            name=self._expr.name, _expr=self._expr, _func=func, _horizontal=self._horizontal
+            name=self._expr.name,
+            _expr=self._expr,
+            _func=func,
+            _horizontal=self._horizontal,
         )
 
     def mean(self) -> AggExpr:
@@ -186,10 +189,10 @@ class Aggregate(Builder):
 
     def rank(self) -> AggExpr:
         return self._build(func=fn.nanrank)
-    
+
     def skew(self) -> AggExpr:
         return self._build(func=fn.nanskew)
-    
+
     def kurt(self) -> AggExpr:
         return self._build(func=fn.nankurt)
 

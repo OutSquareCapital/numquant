@@ -72,7 +72,7 @@ def nanvar(
         return bn.nanvar(a=array, axis=axis, ddof=1)
 
 
-#TODO: implement nanrank, bottleneck is not normalized, and doesn't reduce so conflict with expressions.
+# TODO: implement nanrank, bottleneck is not normalized, and doesn't reduce so conflict with expressions.
 def nanrank(
     array: NDArray[np.float32], axis: int, parallel: bool = False
 ) -> NDArray[np.float32]:
@@ -80,7 +80,8 @@ def nanrank(
         raise NotImplementedError
     else:
         raise NotImplementedError
-    
+
+
 def nanskew(
     array: NDArray[np.float32], axis: int, parallel: bool = False
 ) -> NDArray[np.float32]:
@@ -88,7 +89,8 @@ def nanskew(
         raise NotImplementedError
     else:
         raise NotImplementedError
-    
+
+
 def nankurt(
     array: NDArray[np.float32], axis: int, parallel: bool = False
 ) -> NDArray[np.float32]:
