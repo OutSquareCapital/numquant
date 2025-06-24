@@ -31,8 +31,8 @@ wheels = [
 
 [[package]]
 name = "bn-typed"
-version = "0.1.3"
-source = { git = "https://github.com/OutSquareCapital/bn-typed.git#e9b90be0ca583cf7c553733234e1c7a8512810e4" }
+version = "0.1.4"
+source = { git = "https://github.com/OutSquareCapital/bn-typed.git#d138cb2cf0fe998f79449349e124c75ec0510d91" }
 dependencies = [
     { name = "numpy" },
 ]
