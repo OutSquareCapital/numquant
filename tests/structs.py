@@ -5,7 +5,6 @@ from time import perf_counter
 from typing import Literal, NamedTuple
 
 import numpy as np
-import polars as pl
 from numpy.typing import NDArray
 from tqdm import tqdm
 
@@ -32,10 +31,10 @@ COLORS: dict[Library, str] = {
 }
 
 StatType = Literal[
-    "mean",
-    "sum",
-    "var",
-    "std",
+    "mean",  # Bottleneck is faster than Rustat :(
+    "sum",  # Single threaded faster Rustat 🦀
+    "var",  # Bottleneck is faster than Rustat :(
+    "std",  # Single threaded faster Rustat 🦀
     "max",  # Single threaded faster Rustat 🦀
     "min",  # Single threaded faster Rustat 🦀
     "median",
@@ -92,50 +91,3 @@ class FuncGroup:
                     )
                 )
         return results
-
-
-@dataclass(slots=True)
-class BenchmarkManager:
-    groups: dict[str, FuncGroup]
-
-    def get_perf_for_group(
-        self,
-        df: pl.DataFrame,
-        group_name: StatType,
-        n_passes: int,
-    ) -> pl.DataFrame:
-        group = self.groups.get(group_name)
-        if not group:
-            raise KeyError(f"Group '{group_name}' not found.")
-        group.warmup()
-        arr: NDArray[np.float64] = (
-            df.pivot(
-                on="ticker",
-                index="date",
-                values="pct_return",
-            )
-            .drop("date")
-            .to_numpy()
-            .astype(dtype=np.float64)
-        )
-        results: list[Result] = group.time_group(
-            group_name=group_name, arr=arr, n_passes=n_passes
-        )
-
-        pl.DataFrame(
-            data={
-                "group": group_name,
-                "total_time_secs": round(sum(r.time for r in results) / 1000, 3),
-                "n_passes": n_passes,
-                "time_per_pass_ms": round(sum(r.time for r in results) / n_passes, 3),
-            }
-        ).write_ndjson(Files.SUMMARY)
-        return pl.DataFrame(
-            data={
-                "Library": [r.library for r in results],
-                "Group": [r.group for r in results],
-                "Time (ms)": [r.time for r in results],
-            },
-            schema=["Library", "Group", "Time (ms)"],
-            orient="row",
-        )

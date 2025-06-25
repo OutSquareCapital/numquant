@@ -1,6 +1,6 @@
 from groups import AGG_FUNCS, ROLLING_FUNCS
 from plots import plot_benchmark_results
-from structs import BenchmarkManager
+from manager import BenchmarkManager
 
 if __name__ == "__main__":
     rolling = BenchmarkManager(groups=ROLLING_FUNCS)
@@ -10,5 +10,5 @@ if __name__ == "__main__":
     pio.renderers.default = "browser"  # type: ignore
 
     plot_benchmark_results(
-        manager=rolling, group_name="mean", n_passes=250, log_y=False
+        manager=rolling, group_name="mean", time_target=20, log_y=False
     )

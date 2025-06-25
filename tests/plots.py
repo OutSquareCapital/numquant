@@ -1,4 +1,5 @@
-from structs import StatType, Files, COLORS, BenchmarkManager
+from structs import StatType, Files, COLORS
+from manager import BenchmarkManager
 
 import plotly.express as px
 import polars as pl
@@ -36,12 +37,12 @@ def plot_group_result(
 
 
 def plot_benchmark_results(
-    manager: BenchmarkManager, group_name: StatType, n_passes: int, log_y: bool
+    manager: BenchmarkManager, group_name: StatType, time_target: int, log_y: bool
 ) -> None:
     data: pl.DataFrame = manager.get_perf_for_group(
         df=pl.read_parquet(source=Files.PRICES),
         group_name=group_name,
-        n_passes=n_passes,
+        target_time_secs=time_target,
     )
     plot_group_result(
         avg_data=data,
