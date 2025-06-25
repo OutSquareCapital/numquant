@@ -37,8 +37,8 @@ StatType = Literal[
     "std",  # Single threaded faster Rustat 🦀
     "max",  # Single threaded faster Rustat 🦀
     "min",  # Single threaded faster Rustat 🦀
-    "median",
-    "rank",
+    "median",  # Single threaded faster Rustat 🦀
+    "rank",  # Single threaded faster Rustat 🦀
 ]
 
 

@@ -126,8 +126,12 @@ ROLLING_FUNCS: dict[StatType, FuncGroup] = {
                 partial(bn.move_median, window=250, min_count=250, axis=0),
             ),
             StatFunc(
+                Library.RUSTATS,
+                partial(rs.move_median, length=250, min_length=250, parallel=False),
+            ),
+            StatFunc(
                 Library.RUSTATS_PARALLEL,
-                partial(rs.move_median, length=250, min_length=250),
+                partial(rs.move_median, length=250, min_length=250, parallel=True),
             ),
         ],
     ),
@@ -138,8 +142,12 @@ ROLLING_FUNCS: dict[StatType, FuncGroup] = {
                 partial(bn.move_rank, window=250, min_count=250, axis=0),
             ),
             StatFunc(
+                Library.RUSTATS,
+                partial(rs.move_rank, length=250, min_length=250, parallel=False),
+            ),
+            StatFunc(
                 Library.RUSTATS_PARALLEL,
-                partial(rs.move_rank, length=250, min_length=250),
+                partial(rs.move_rank, length=250, min_length=250, parallel=True),
             ),
         ],
     ),
