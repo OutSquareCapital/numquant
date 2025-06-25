@@ -23,8 +23,8 @@ col = ColSelector()
 class LazyFrame:
     __slots__ = ("data", "names", "_exprs")
 
-    def __init__(self, data: dict[str, NDArray[np.float32]], names: list[str]) -> None:
-        self.data: dict[str, NDArray[np.float32]] = data
+    def __init__(self, data: dict[str, NDArray[np.float64]], names: list[str]) -> None:
+        self.data: dict[str, NDArray[np.float64]] = data
         self.names: list[str] = names
         self._exprs: dict[str, list[Expr]] = {name: [] for name in names}
 
@@ -80,7 +80,7 @@ class LazyFrame:
         return self._new(old=self, exprs=new_exprs)
 
     def collect(self) -> Self:
-        new_data: dict[str, NDArray[np.float32]] = deepcopy(self.data)
+        new_data: dict[str, NDArray[np.float64]] = deepcopy(self.data)
         for col, current_exprs in self._exprs.items():
             for e in current_exprs:
                 new_data[col] = e._execute(data=new_data[col])  # type: ignore
@@ -90,19 +90,19 @@ class LazyFrame:
 def read_parquet(
     file: Path, names_col: str, index_col: str, values_cols: list[str]
 ) -> "LazyFrame":
-    data: dict[str, NDArray[np.float32]] = {}
+    data: dict[str, NDArray[np.float64]] = {}
     df: pl.DataFrame = pl.read_parquet(source=file)
     values_nb: int = len(values_cols)
     for i in range(values_nb - 1):
-        current_array: NDArray[np.float32] = (
+        current_array: NDArray[np.float64] = (
             df.pivot(on=names_col, index=index_col, values=values_cols[i])
             .drop(index_col)
             .to_numpy()
-            .astype(dtype=np.float32)
+            .astype(dtype=np.float64)
         )
         data[values_cols[i]] = current_array
     large_df: pl.DataFrame = df.pivot(
         on=names_col, index=index_col, values=values_cols[-1]
     )
-    data[values_cols[-1]] = large_df.drop(index_col).to_numpy().astype(dtype=np.float32)
+    data[values_cols[-1]] = large_df.drop(index_col).to_numpy().astype(dtype=np.float64)
     return LazyFrame(data=data, names=values_cols)

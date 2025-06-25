@@ -19,9 +19,11 @@ dependencies = [
     "plotly>=6.1.2",
     "plotly-stubs>=0.0.5",
     "polars>=1.30.0",
+    "pyarrow>=20.0.0",
     "pyright>=1.1.401",
     "ruff>=0.11.12",
     "rustats",
+    "tqdm>=4.67.1",
 ]
 [tool.uv.sources]
 bn-typed = { git = "https://github.com/OutSquareCapital/bn-typed.git" }

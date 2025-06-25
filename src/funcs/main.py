@@ -8,8 +8,8 @@ import rustats as rs
 
 
 def nanmean(
-    array: NDArray[np.float32], axis: int, parallel: bool = False
-) -> NDArray[np.float32]:
+    array: NDArray[np.float64], axis: int, parallel: bool = False
+) -> NDArray[np.float64]:
     if parallel:
         return rs.agg_mean(array=array, parallel=parallel)
     else:
@@ -17,8 +17,8 @@ def nanmean(
 
 
 def nanmedian(
-    array: NDArray[np.float32], axis: int, parallel: bool = False
-) -> NDArray[np.float32]:
+    array: NDArray[np.float64], axis: int, parallel: bool = False
+) -> NDArray[np.float64]:
     if parallel:
         return rs.agg_median(array=array)
     else:
@@ -26,8 +26,8 @@ def nanmedian(
 
 
 def nanmax(
-    array: NDArray[np.float32], axis: int, parallel: bool = False
-) -> NDArray[np.float32]:
+    array: NDArray[np.float64], axis: int, parallel: bool = False
+) -> NDArray[np.float64]:
     if parallel:
         return rs.agg_max(array=array, parallel=parallel)
     else:
@@ -35,8 +35,8 @@ def nanmax(
 
 
 def nanmin(
-    array: NDArray[np.float32], axis: int, parallel: bool = False
-) -> NDArray[np.float32]:
+    array: NDArray[np.float64], axis: int, parallel: bool = False
+) -> NDArray[np.float64]:
     if parallel:
         return rs.agg_min(array=array, parallel=parallel)
     else:
@@ -44,8 +44,8 @@ def nanmin(
 
 
 def nansum(
-    array: NDArray[np.float32], axis: int, parallel: bool = False
-) -> NDArray[np.float32]:
+    array: NDArray[np.float64], axis: int, parallel: bool = False
+) -> NDArray[np.float64]:
     if parallel:
         return rs.agg_sum(array=array, parallel=parallel)
     else:
@@ -53,8 +53,8 @@ def nansum(
 
 
 def nanstd(
-    array: NDArray[np.float32], axis: int, parallel: bool = False
-) -> NDArray[np.float32]:
+    array: NDArray[np.float64], axis: int, parallel: bool = False
+) -> NDArray[np.float64]:
     if parallel:
         return rs.agg_std(array=array, parallel=parallel)
     else:
@@ -62,8 +62,8 @@ def nanstd(
 
 
 def nanvar(
-    array: NDArray[np.float32], axis: int, parallel: bool = False
-) -> NDArray[np.float32]:
+    array: NDArray[np.float64], axis: int, parallel: bool = False
+) -> NDArray[np.float64]:
     if parallel:
         return rs.agg_var(array=array, parallel=parallel)
     else:
@@ -71,19 +71,19 @@ def nanvar(
 
 
 def nanrank(
-    array: NDArray[np.float32], axis: int, parallel: bool = False
-) -> NDArray[np.float32]:
+    array: NDArray[np.float64], axis: int, parallel: bool = False
+) -> NDArray[np.float64]:
     # TODO: implement non-parallel version
     return rs.agg_rank(array=array)
 
 
 def nanskew(
-    array: NDArray[np.float32], axis: int, parallel: bool = False
-) -> NDArray[np.float32]:
+    array: NDArray[np.float64], axis: int, parallel: bool = False
+) -> NDArray[np.float64]:
     return rs.agg_skewness(array=array, parallel=parallel)
 
 
 def nankurt(
-    array: NDArray[np.float32], axis: int, parallel: bool = False
-) -> NDArray[np.float32]:
+    array: NDArray[np.float64], axis: int, parallel: bool = False
+) -> NDArray[np.float64]:
     return rs.agg_kurtosis(array=array, parallel=parallel)

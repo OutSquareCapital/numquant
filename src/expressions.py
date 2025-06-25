@@ -16,7 +16,7 @@ def _wrap_expr(expr: "float|Expr") -> "Expr":
 class Expr:
     name: str
 
-    def _execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
+    def _execute(self, data: NDArray[np.float64]) -> NDArray[np.float64]:
         raise NotImplementedError
 
     def add(self, other: "float|Expr") -> "BinaryOpExpr":
@@ -58,7 +58,7 @@ class Expr:
             name=self.name,
             _expr=self,
             _func=partial(
-                np.clip, a_min=-np.float32(lower_bound), a_max=np.float32(upper_bound)
+                np.clip, a_min=-np.float64(lower_bound), a_max=np.float64(upper_bound)
             ),
         )
 
@@ -86,13 +86,13 @@ class Expr:
 class Builder:
     _expr: Expr
 
-    def _build(self, func: Callable[..., NDArray[np.float32]]) -> Expr:
+    def _build(self, func: Callable[..., NDArray[np.float64]]) -> Expr:
         raise NotImplementedError
 
 
 @dataclass(slots=True, frozen=True)
 class ColExpr(Expr):
-    def _execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
+    def _execute(self, data: NDArray[np.float64]) -> NDArray[np.float64]:
         return data
 
 
@@ -100,17 +100,17 @@ class ColExpr(Expr):
 class LiteralExpr(Expr):
     _value: float
 
-    def _execute(self, data: NDArray[np.float32]) -> np.float32:  # type: ignore[override]
-        return np.float32(self._value)
+    def _execute(self, data: NDArray[np.float64]) -> np.float64:  # type: ignore[override]
+        return np.float64(self._value)
 
 
 @dataclass(slots=True, frozen=True)
 class BasicExpr(Expr):
     _expr: Expr
-    _func: Callable[..., NDArray[np.float32]]
+    _func: Callable[..., NDArray[np.float64]]
 
-    def _execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
-        expr: NDArray[np.float32] = self._expr._execute(data=data)
+    def _execute(self, data: NDArray[np.float64]) -> NDArray[np.float64]:
+        expr: NDArray[np.float64] = self._expr._execute(data=data)
         return self._func(expr)
 
 
@@ -118,22 +118,22 @@ class BasicExpr(Expr):
 class BinaryOpExpr(Expr):
     _left: Expr
     _right: Expr
-    _func: Callable[..., NDArray[np.float32]]
+    _func: Callable[..., NDArray[np.float64]]
 
-    def _execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
-        left: NDArray[np.float32] = self._left._execute(data=data)
-        right: NDArray[np.float32] = self._right._execute(data=data)
+    def _execute(self, data: NDArray[np.float64]) -> NDArray[np.float64]:
+        left: NDArray[np.float64] = self._left._execute(data=data)
+        right: NDArray[np.float64] = self._right._execute(data=data)
         return self._func(left, right)
 
 
 @dataclass(slots=True, frozen=True)
 class AggExpr(Expr):
     _expr: Expr
-    _func: Callable[[NDArray[np.float32], int], NDArray[np.float32]]
+    _func: Callable[[NDArray[np.float64], int], NDArray[np.float64]]
     _horizontal: bool
 
-    def _execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
-        expr: NDArray[np.float32] = self._expr._execute(data=data)
+    def _execute(self, data: NDArray[np.float64]) -> NDArray[np.float64]:
+        expr: NDArray[np.float64] = self._expr._execute(data=data)
         if self._horizontal:
             return np.broadcast_to(
                 array=self._func(expr, 1)[:, np.newaxis], shape=expr.shape
@@ -147,10 +147,10 @@ class RollingExpr(Expr):
     _expr: Expr
     _len: int
     _min_len: int
-    _func: Callable[..., NDArray[np.float32]]
+    _func: Callable[..., NDArray[np.float64]]
 
-    def _execute(self, data: NDArray[np.float32]) -> NDArray[np.float32]:
-        expr: NDArray[np.float32] = self._expr._execute(data=data)
+    def _execute(self, data: NDArray[np.float64]) -> NDArray[np.float64]:
+        expr: NDArray[np.float64] = self._expr._execute(data=data)
         return self._func(expr, self._len, self._min_len)
 
 
@@ -158,7 +158,7 @@ class RollingExpr(Expr):
 class Aggregate(Builder):
     _horizontal: bool
 
-    def _build(self, func: Callable[..., NDArray[np.float32]]) -> AggExpr:
+    def _build(self, func: Callable[..., NDArray[np.float64]]) -> AggExpr:
         return AggExpr(
             name=self._expr.name,
             _expr=self._expr,
@@ -199,7 +199,7 @@ class Aggregate(Builder):
 
 @dataclass(slots=True, frozen=True)
 class Fill(Builder):
-    def _build(self, func: Callable[..., NDArray[np.float32]]) -> BasicExpr:
+    def _build(self, func: Callable[..., NDArray[np.float64]]) -> BasicExpr:
         return BasicExpr(name=self._expr.name, _expr=self._expr, _func=func)
 
     def by_median(self) -> BasicExpr:
@@ -217,7 +217,7 @@ class Window(Builder):
     _len: int
     _min_len: int
 
-    def _build(self, func: Callable[..., NDArray[np.float32]]) -> RollingExpr:
+    def _build(self, func: Callable[..., NDArray[np.float64]]) -> RollingExpr:
         return RollingExpr(
             name=self._expr.name,
             _expr=self._expr,
@@ -259,7 +259,7 @@ class Window(Builder):
 
 @dataclass(slots=True, frozen=True)
 class Converter(Builder):
-    def _build(self, func: Callable[..., NDArray[np.float32]]) -> BasicExpr:
+    def _build(self, func: Callable[..., NDArray[np.float64]]) -> BasicExpr:
         return BasicExpr(name=self._expr.name, _expr=self._expr, _func=func)
 
     def equity_to_log(self) -> BasicExpr:
