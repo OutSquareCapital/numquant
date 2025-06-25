@@ -6,7 +6,7 @@ dist/
 wheels/
 *.egg-info
 *.ipynb
-*.parquet
+*.json
 
 # Virtual environments
 .venv
@@ -15,4 +15,3 @@ wheels/
 # Added by cargo
 
 /rust/target
-perf_test.py
