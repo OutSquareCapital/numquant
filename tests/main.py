@@ -8,7 +8,19 @@ if __name__ == "__main__":
     import plotly.io as pio
 
     pio.renderers.default = "browser"  # type: ignore
-
-    plot_benchmark_results(
-        manager=rolling, group_name="mean", time_target=20, log_y=False
-    )
+    while True:
+        group_name: str = input("enter the group to test: ").strip()
+        if group_name not in rolling.groups:
+            print(f"Group '{group_name}' not found in rolling functions.")
+            continue
+        time_input: str = input("enter the time target in seconds(default 20 seconds):").strip()
+        if time_input == "":
+            time_target = 20
+        else:
+            time_target = int(time_input)
+        plot_benchmark_results(
+            manager=rolling,
+            group_name=group_name,
+            time_target=time_target,
+            log_y=False,
+        )
