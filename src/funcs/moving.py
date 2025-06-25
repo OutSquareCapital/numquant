@@ -19,7 +19,9 @@ def move_median(
     array: NDArray[np.float64], length: int, min_length: int, parallel: bool = False
 ) -> NDArray[np.float64]:
     if parallel:
-        return rs.move_median(array=array, length=length, min_length=min_length, parallel=parallel)
+        return rs.move_median(
+            array=array, length=length, min_length=min_length, parallel=parallel
+        )
     else:
         return bn.move_median(a=array, window=length, min_count=min_length, axis=0)
 
@@ -99,6 +101,8 @@ def move_rank(
     array: NDArray[np.float64], length: int, min_length: int, parallel: bool = False
 ) -> NDArray[np.float64]:
     if parallel:
-        return rs.move_rank(array=array, length=length, min_length=min_length, parallel=parallel)
+        return rs.move_rank(
+            array=array, length=length, min_length=min_length, parallel=parallel
+        )
     else:
         return bn.move_rank(a=array, window=length, min_count=min_length, axis=0)

@@ -4,26 +4,38 @@ import bottleneck as bn
 import numbagg as nbg
 import rustats as rs
 
-from structs import FuncGroup, Library, StatFunc, StatType
+from structs import FuncGroup, Library, StatFunc, StatType, Length
 
 ROLLING_FUNCS: dict[StatType, FuncGroup] = {
     "mean": FuncGroup(
         funcs=[
             StatFunc(
                 Library.BOTTLENECK,
-                partial(bn.move_mean, window=250, min_count=250, axis=0),
+                partial(bn.move_mean, window=Length.FULL, min_count=Length.MIN, axis=0),
             ),
             StatFunc(
                 Library.RUSTATS,
-                partial(rs.move_mean, length=250, min_length=250, parallel=False),
+                partial(
+                    rs.move_mean,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=False,
+                ),
             ),
             StatFunc(
                 Library.RUSTATS_PARALLEL,
-                partial(rs.move_mean, length=250, min_length=250, parallel=True),
+                partial(
+                    rs.move_mean,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=True,
+                ),
             ),
             StatFunc(
                 Library.NUMBAGG,
-                partial(nbg.move_mean, window=250, min_count=250, axis=0),
+                partial(
+                    nbg.move_mean, window=Length.FULL, min_count=Length.MIN, axis=0
+                ),
             ),
         ],
     ),
@@ -31,19 +43,29 @@ ROLLING_FUNCS: dict[StatType, FuncGroup] = {
         funcs=[
             StatFunc(
                 Library.BOTTLENECK,
-                partial(bn.move_sum, window=250, min_count=250, axis=0),
+                partial(bn.move_sum, window=Length.FULL, min_count=Length.MIN, axis=0),
             ),
             StatFunc(
                 Library.RUSTATS,
-                partial(rs.move_sum, length=250, min_length=250, parallel=False),
+                partial(
+                    rs.move_sum,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=False,
+                ),
             ),
             StatFunc(
                 Library.RUSTATS_PARALLEL,
-                partial(rs.move_sum, length=250, min_length=250, parallel=True),
+                partial(
+                    rs.move_sum,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=True,
+                ),
             ),
             StatFunc(
                 Library.NUMBAGG,
-                partial(nbg.move_sum, window=250, min_count=250, axis=0),
+                partial(nbg.move_sum, window=Length.FULL, min_count=Length.MIN, axis=0),
             ),
         ],
     ),
@@ -51,19 +73,35 @@ ROLLING_FUNCS: dict[StatType, FuncGroup] = {
         funcs=[
             StatFunc(
                 Library.BOTTLENECK,
-                partial(bn.move_var, window=250, min_count=250, axis=0, ddof=1),
+                partial(
+                    bn.move_var,
+                    window=Length.FULL,
+                    min_count=Length.MIN,
+                    axis=0,
+                    ddof=1,
+                ),
             ),
             StatFunc(
                 Library.RUSTATS,
-                partial(rs.move_var, length=250, min_length=250, parallel=False),
+                partial(
+                    rs.move_var,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=False,
+                ),
             ),
             StatFunc(
                 Library.RUSTATS_PARALLEL,
-                partial(rs.move_var, length=250, min_length=250, parallel=True),
+                partial(
+                    rs.move_var,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=True,
+                ),
             ),
             StatFunc(
                 Library.NUMBAGG,
-                partial(nbg.move_var, window=250, min_count=250, axis=0),
+                partial(nbg.move_var, window=Length.FULL, min_count=Length.MIN, axis=0),
             ),
         ],
     ),
@@ -71,19 +109,35 @@ ROLLING_FUNCS: dict[StatType, FuncGroup] = {
         funcs=[
             StatFunc(
                 Library.BOTTLENECK,
-                partial(bn.move_std, window=250, min_count=250, axis=0, ddof=1),
+                partial(
+                    bn.move_std,
+                    window=Length.FULL,
+                    min_count=Length.MIN,
+                    axis=0,
+                    ddof=1,
+                ),
             ),
             StatFunc(
                 Library.RUSTATS,
-                partial(rs.move_std, length=250, min_length=250, parallel=False),
+                partial(
+                    rs.move_std,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=False,
+                ),
             ),
             StatFunc(
                 Library.RUSTATS_PARALLEL,
-                partial(rs.move_std, length=250, min_length=250, parallel=True),
+                partial(
+                    rs.move_std,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=True,
+                ),
             ),
             StatFunc(
                 Library.NUMBAGG,
-                partial(nbg.move_std, window=250, min_count=250, axis=0),
+                partial(nbg.move_std, window=Length.FULL, min_count=Length.MIN, axis=0),
             ),
         ],
     ),
@@ -91,15 +145,25 @@ ROLLING_FUNCS: dict[StatType, FuncGroup] = {
         funcs=[
             StatFunc(
                 Library.BOTTLENECK,
-                partial(bn.move_max, window=250, min_count=250, axis=0),
+                partial(bn.move_max, window=Length.FULL, min_count=Length.MIN, axis=0),
             ),
             StatFunc(
                 Library.RUSTATS,
-                partial(rs.move_max, length=250, min_length=250, parallel=False),
+                partial(
+                    rs.move_max,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=False,
+                ),
             ),
             StatFunc(
                 Library.RUSTATS_PARALLEL,
-                partial(rs.move_max, length=250, min_length=250, parallel=True),
+                partial(
+                    rs.move_max,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=True,
+                ),
             ),
         ],
     ),
@@ -107,15 +171,25 @@ ROLLING_FUNCS: dict[StatType, FuncGroup] = {
         funcs=[
             StatFunc(
                 Library.BOTTLENECK,
-                partial(bn.move_min, window=250, min_count=250, axis=0),
+                partial(bn.move_min, window=Length.FULL, min_count=Length.MIN, axis=0),
             ),
             StatFunc(
                 Library.RUSTATS,
-                partial(rs.move_min, length=250, min_length=250, parallel=False),
+                partial(
+                    rs.move_min,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=False,
+                ),
             ),
             StatFunc(
                 Library.RUSTATS_PARALLEL,
-                partial(rs.move_min, length=250, min_length=250, parallel=True),
+                partial(
+                    rs.move_min,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=True,
+                ),
             ),
         ],
     ),
@@ -123,15 +197,27 @@ ROLLING_FUNCS: dict[StatType, FuncGroup] = {
         funcs=[
             StatFunc(
                 Library.BOTTLENECK,
-                partial(bn.move_median, window=250, min_count=250, axis=0),
+                partial(
+                    bn.move_median, window=Length.FULL, min_count=Length.MIN, axis=0
+                ),
             ),
             StatFunc(
                 Library.RUSTATS,
-                partial(rs.move_median, length=250, min_length=250, parallel=False),
+                partial(
+                    rs.move_median,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=False,
+                ),
             ),
             StatFunc(
                 Library.RUSTATS_PARALLEL,
-                partial(rs.move_median, length=250, min_length=250, parallel=True),
+                partial(
+                    rs.move_median,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=True,
+                ),
             ),
         ],
     ),
@@ -139,15 +225,25 @@ ROLLING_FUNCS: dict[StatType, FuncGroup] = {
         funcs=[
             StatFunc(
                 Library.BOTTLENECK,
-                partial(bn.move_rank, window=250, min_count=250, axis=0),
+                partial(bn.move_rank, window=Length.FULL, min_count=Length.MIN, axis=0),
             ),
             StatFunc(
                 Library.RUSTATS,
-                partial(rs.move_rank, length=250, min_length=250, parallel=False),
+                partial(
+                    rs.move_rank,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=False,
+                ),
             ),
             StatFunc(
                 Library.RUSTATS_PARALLEL,
-                partial(rs.move_rank, length=250, min_length=250, parallel=True),
+                partial(
+                    rs.move_rank,
+                    length=Length.FULL,
+                    min_length=Length.MIN,
+                    parallel=True,
+                ),
             ),
         ],
     ),

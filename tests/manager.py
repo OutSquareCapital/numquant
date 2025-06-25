@@ -12,7 +12,7 @@ class BenchmarkManager:
 
     def get_perf_for_group(
         self,
-        df: pl.DataFrame,
+        array: NDArray[np.float64],
         group_name: StatType,
         target_time_secs: float,
     ) -> pl.DataFrame:
@@ -25,7 +25,7 @@ class BenchmarkManager:
         )
 
         results: list[Result] = group.time_group(
-            group_name=group_name, arr=_get_array(df=df), n_passes=n_passes
+            group_name=group_name, arr=array, n_passes=n_passes
         )
         _save_total_time(group_name, results, n_passes)
         return _get_formatted_results(results=results)
@@ -40,19 +40,6 @@ def _get_formatted_results(results: list[Result]) -> pl.DataFrame:
         },
         schema=["Library", "Group", "Time (ms)"],
         orient="row",
-    )
-
-
-def _get_array(df: pl.DataFrame) -> NDArray[np.float64]:
-    return (
-        df.pivot(
-            on="ticker",
-            index="date",
-            values="pct_return",
-        )
-        .drop("date")
-        .to_numpy()
-        .astype(dtype=np.float64)
     )
 
 

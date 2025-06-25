@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from dataclasses import dataclass
-from enum import StrEnum, auto
+from enum import StrEnum, auto, IntEnum
 from time import perf_counter
 from typing import Literal, NamedTuple
 
@@ -9,6 +9,11 @@ from numpy.typing import NDArray
 from tqdm import tqdm
 
 type Computation = Callable[[NDArray[np.float64]], NDArray[np.float64]]
+
+
+class Length(IntEnum):
+    MIN = 25
+    FULL = 250
 
 
 class Files(StrEnum):
@@ -31,14 +36,14 @@ COLORS: dict[Library, str] = {
 }
 
 StatType = Literal[
-    "mean",  # Bottleneck is faster than Rustat :(
-    "sum",  # Single threaded faster Rustat 🦀
-    "var",  # Bottleneck is faster than Rustat :(
-    "std",  # Single threaded faster Rustat 🦀
-    "max",  # Single threaded faster Rustat 🦀
-    "min",  # Single threaded faster Rustat 🦀
-    "median",  # Single threaded faster Rustat 🦀
-    "rank",  # Single threaded faster Rustat 🦀
+    "mean",  # 🐍 ✅
+    "sum",  # 🦀 ✅
+    "var",  # 🐍 ✅
+    "std",  # 🦀 ✅
+    "max",  # 🦀 ✅
+    "min",  # 🦀 ✅
+    "median",  # 🐍 ✅ current 12.5 ms median avec std 5 ms 25-75th quartile
+    "rank",  # 🦀 ✅
 ]
 
 
