@@ -1,4 +1,4 @@
-from structs import StatType, Files, COLORS
+from structs import Files, COLORS, StatType
 from manager import BenchmarkManager
 
 import plotly.express as px

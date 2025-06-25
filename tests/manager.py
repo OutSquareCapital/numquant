@@ -3,12 +3,12 @@ from dataclasses import dataclass
 import numpy as np
 import polars as pl
 from numpy.typing import NDArray
-from structs import StatType, FuncGroup, Result, Files
+from structs import FuncGroup, Result, Files, StatType
 
 
 @dataclass(slots=True)
 class BenchmarkManager:
-    groups: dict[str, FuncGroup]
+    groups: dict[StatType, FuncGroup]
 
     def get_perf_for_group(
         self,
@@ -56,7 +56,7 @@ def _get_array(df: pl.DataFrame) -> NDArray[np.float64]:
     )
 
 
-def _get_n_passes(target_time_secs: float, group_name: StatType) -> int:
+def _get_n_passes(target_time_secs: float, group_name: str) -> int:
     summary_data: pl.DataFrame = pl.read_ndjson(Files.SUMMARY)
     group_data = summary_data.filter(pl.col("group") == group_name)
 
@@ -67,9 +67,7 @@ def _get_n_passes(target_time_secs: float, group_name: StatType) -> int:
         return max(1, int((target_time_secs * 1000) / avg_time_per_pass))
 
 
-def _save_total_time(
-    group_name: StatType, results: list[Result], n_passes: int
-) -> None:
+def _save_total_time(group_name: str, results: list[Result], n_passes: int) -> None:
     new_data = pl.DataFrame(
         data={
             "group": group_name,

@@ -4,9 +4,9 @@ import bottleneck as bn
 import numbagg as nbg
 import rustats as rs
 
-from structs import FuncGroup, Library, StatFunc
+from structs import FuncGroup, Library, StatFunc, StatType
 
-ROLLING_FUNCS: dict[str, FuncGroup] = {
+ROLLING_FUNCS: dict[StatType, FuncGroup] = {
     "mean": FuncGroup(
         funcs=[
             StatFunc(
@@ -145,7 +145,7 @@ ROLLING_FUNCS: dict[str, FuncGroup] = {
     ),
 }
 
-AGG_FUNCS: dict[str, FuncGroup] = {
+AGG_FUNCS: dict[StatType, FuncGroup] = {
     "mean": FuncGroup(
         funcs=[
             StatFunc(

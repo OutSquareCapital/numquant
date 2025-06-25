@@ -73,7 +73,7 @@ class FuncGroup:
 
     def time_group(
         self,
-        group_name: StatType,
+        group_name: str,
         arr: NDArray[np.float64],
         n_passes: int,
     ) -> list[Result]:
