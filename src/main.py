@@ -88,7 +88,7 @@ class LazyFrame:
 
 
 def read_parquet(
-    file: Path, names_col: str, index_col: str, values_cols: list[str]
+    file: Path|str, names_col: str, index_col: str, values_cols: list[str]
 ) -> "LazyFrame":
     data: dict[str, NDArray[np.float64]] = {}
     df: pl.DataFrame = pl.read_parquet(source=file)

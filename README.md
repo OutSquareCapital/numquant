@@ -1,48 +1,67 @@
-# QuantLab: Strongly-Typed, Method-Chained Numpy Array Container
+# Numquant: Polars-like syntax for Numpy arrays
 
 ## Project Overview
-QuantLab provides a strongly-typed container for Numpy arrays, designed for method chaining and high-performance numerical operations. By leveraging external libraries such as Bottleneck and Numbagg, it combines a user-friendly API, strong typing, and computational efficiency. The architecture emphasizes clear type contracts, modularity, and separation of concerns for maintainability and extensibility.
+Numquant provides a strongly-typed container for Numpy arrays, designed for method chaining and high-performance numerical operations.
+
+leverages high performance from external libraries such as Bottleneck, Rustats and Numbagg. 
+
+The architecture emphasizes clear type contracts, modularity, and separation of concerns for maintainability and extensibility.
+
+Just like polars, allow the creation of reusable expressions and lazy evaluations.
+
+## Example
+
+````python
+df: nq.LazyFrame = nq.read_parquet(
+    file="foo", names_col="tickers", index_col="date", values_cols=["close"]
+)
+
+expr_example = nq.col(name="close").rolling(len=20).mean()  # rolling mean
+
+df.get(
+    nq.col(name="close").rolling(len=20).kurt(),  # rolling kurtosis
+    nq.col(name="close").vertical.stdev().mul(16.0),  # annualized volatility
+    nq.col(name="close")
+    .convert.equity_to_pct()
+    .abs(),  # absolute daily returns in percent
+    nq.col(name="close").div(
+        other=nq.col(name="close")
+        .rolling(250)
+        .median()
+        .sub(1),  # relative to 250-day median
+    ),
+    expr_example,  # reusable expression
+)
+
+df.collect() # actual computation
+````
 
 ## Module Breakdown
 
-### interface.py
-Defines the foundational `ArrayBase` class, which encapsulates the underlying Numpy array and provides core methods for element-wise operations, transformations, and utility functions. Key features include:
+### main.py
+Defines the `LazyFrame` class, which encapsulates Numpy arrays and provides core methods for data manipulation and transformation. Key features include:
 - Memory efficiency with `__slots__`.
 - Strictly-typed Numpy array enforcement.
 - Immutable operations with method chaining.
-- Specialized transformations like `cross_rank`.
-- Compatibility with strict typing for seamless integration with libraries like Numbagg, Numba, and Bottleneck.
+- Integration with Polars for efficient data loading and transformation.
+- Convenient data loading with the `read_parquet` function.
+
+### expressions.py
+Implements the foundational `Expr` class and its derivatives for constructing and executing expressions on Numpy arrays. Components include:
+- `Expr`: Base class for all expressions.
+- `ColExpr`: Represents column selection.
+- `LiteralExpr`: Encapsulates literal values.
+- `BinaryOpExpr`: Handles binary operations like addition, subtraction, multiplication, and division.
+- `BasicExpr`: Encapsulates unary operations like absolute value, square root, and clipping.
+- `RollingExpr`: Supports rolling window operations.
+- `AggExpr`: Enables aggregate computations.
+- `Builder` subclasses for constructing complex expressions.
 
 ### funcs/
-Implements rolling statistical moments (e.g., skewness, kurtosis) and cross-sectional ranking using Numba for efficient, compiled execution. Components include:
-- `stats.py`: Low-level statistical functions.
-- `interfaces.py`: Base classes and protocols for accumulators and rolling functions.
-- `implementations.py`: Numba-compiled rolling statistical functions.
-
-### window.py
-The `WindowExecutor` class provides rolling and expanding window operations, supporting statistics like mean, median, max, min, sum, standard deviation, skewness, and kurtosis. Highlights:
-- Generic typing for compatibility with `ArrayBase` derivatives.
-- Bottleneck for efficient computations.
-- Custom Numba-compiled functions for complex statistics.
-
-### aggregate.py
-The `AggregateExecutor` class handles cross-sectional aggregations, offering methods for computing statistics across arrays or specific axes. Features:
-- Generic typing for `ArrayBase` derivatives.
-- High-performance aggregations with Bottleneck.
-- Type-consistent reshaping and wrapping of results.
-
-### convert.py
-The `ConverterExecutor` class provides methods for converting between data representations, such as equity values, percentages, and logarithmic returns. Key functionalities:
-- NaN handling and edge case management.
-- Vectorized Numpy operations for efficiency.
-- Time-shifting capabilities with the `shift` method.
-
-### main.py
-Defines the public-facing `Array` and `Map` classes. Key features:
-- `Array`: High-level analytical methods for financial analysis (e.g., `normalize_signal`, `z_score`, `vol_target`).
-- `Map`: Container for multiple arrays with shared indices and names.
-- Integration with executor classes for rolling, expanding, aggregation, and conversion operations.
-- Convenient data loading with the `read_parquet` function.
+Provides low-level statistical and transformation functions used by expressions. Highlights:
+- Efficient implementations using Numpy and Numba.
+- Support for rolling statistics, aggregations, and data conversions.
+- Modular design for extensibility.
 
 ## Design Choices
 
@@ -52,15 +71,5 @@ Explicit typing reduces runtime errors and improves IDE support, ensuring compat
 ### Method Chaining
 The API enables fluent method chaining for concise and expressive data transformations.
 
-### Separation of Concerns
-Computation logic (executors) is separated from data containers, improving maintainability and extensibility.
-
-### Performance
-- Bottleneck and Numbagg for fast aggregate and windowed operations.
-- Numba for custom rolling functions.
-
-### Extensibility
-The modular design allows for easy addition of new computation strategies or array types.
-
 ## Summary
-QuantLab provides a modular, strongly-typed, and high-performance framework for numerical array operations in Python. It combines a clear and extensible API with efficient computation, while maintaining strict type contracts and separation of concerns. The focus on method chaining and immutable operations enables expressive and reliable data transformations for quantitative analysis.
+Numquant provides a modular, strongly-typed, and high-performance framework for numerical array operations in Python. It combines a clear and extensible API with efficient computation, while maintaining strict type contracts and separation of concerns. The focus on method chaining and immutable operations enables expressive and reliable data transformations for quantitative analysis.
