@@ -1,4 +1,4 @@
-from ._lib import Array
+from ._lib import Array, NumericArray
 from ._types import (
     Boolean,
     Float32,
@@ -15,6 +15,7 @@ from ._types import (
 
 __all__: list[str] = [
     "Array",
+    "NumericArray",
     "Float32",
     "Float64",
     "Int8",

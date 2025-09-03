@@ -63,11 +63,23 @@ class NumericArray[T: tp.Numeric](Array[T]):
     def sub(self, other: NDArray[T] | float | int) -> Self:
         return self._new(np.subtract(self.data, other))
 
+    def sub_r(self, other: NDArray[T] | float | int) -> Self:
+        return self._new(np.subtract(other, self.data))
+
     def mul(self, other: NDArray[T] | float | int) -> Self:
         return self._new(np.multiply(self.data, other))
 
     def truediv(self, other: NDArray[T] | float | int) -> Self:
         return self._new(np.divide(self.data, other))
+
+    def truediv_r(self, other: NDArray[T] | float | int) -> Self:
+        return self._new(np.divide(other, self.data))
+
+    def floor_div(self, other: NDArray[T] | float | int) -> Self:
+        return self._new(np.floor_divide(self.data, other))
+
+    def floor_div_r(self, other: NDArray[T] | float | int) -> Self:
+        return self._new(np.floor_divide(other, self.data))
 
     def sign(self) -> Self:
         return self._new(np.sign(self.data))
