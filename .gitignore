@@ -5,10 +5,6 @@ build/
 dist/
 wheels/
 *.egg-info
-*.ipynb
-*.json
-*.ndjson
-
 # Virtual environments
 .venv
 
