@@ -2,10 +2,9 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Concatenate, Literal, Self
 
+import _types as tp
 import numpy as np
 from numpy.typing import NDArray
-
-from . import _types as tp
 
 
 @dataclass(slots=True, repr=False)

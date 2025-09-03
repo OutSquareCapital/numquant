@@ -1,5 +1,5 @@
-from src._lib import Array
-from src._types import (
+from ._lib import Array
+from ._types import (
     Boolean,
     Float32,
     Float64,
