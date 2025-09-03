@@ -7,19 +7,12 @@ requires-python = ">=3.13.4"
 dependencies = [
     "bn-typed",
     "bottleneck>=1.5.0",
-    "ipykernel>=6.29.5",
-    "latexify-py>=0.4.4",
-    "nbformat>=5.10.4",
-    "nbg-typed",
     "numba>=0.61.2",
     "numbagg>=0.9.0",
     "numpy>=2.2.6",
-    "polars>=1.30.0",
-    "pyright>=1.1.401",
-    "ruff>=0.11.12",
     "rustats",
 ]
 [tool.uv.sources]
-bn-typed = { git = "https://github.com/OutSquareCapital/bn-typed.git" }
-nbg-typed = { git = "https://github.com/OutSquareCapital/nbg-typed.git" }
 rustats = { git = "https://github.com/OutSquareCapital/rustats.git" }
+numbagg = { git = "https://github.com/numbagg/numbagg.git" }
+bn-typed = { git = "https://github.com/OutSquareCapital/bottleneck-stubs.git" }
