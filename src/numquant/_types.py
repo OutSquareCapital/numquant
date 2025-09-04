@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.typing import NDArray
 
 Float32 = np.float32
 Float64 = np.float64
@@ -20,3 +21,6 @@ type UnsignedInteger = UInt | UInt8 | UInt16 | UInt32 | UInt64
 type Numeric = Float | Integer | UnsignedInteger
 
 Boolean = np.bool_
+
+
+type IntoArr[T: Boolean | Numeric] = NDArray[T] | float | int

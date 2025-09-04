@@ -4,9 +4,8 @@ from typing import Concatenate, Literal, Self
 
 import numpy as np
 import polars as pl
-from numpy.typing import NDArray
 
-from ._types import Boolean, Numeric
+from ._types import Boolean, IntoArr, NDArray, Numeric
 
 
 @dataclass(slots=True, repr=False)
@@ -28,13 +27,13 @@ class Array[T: Boolean | Numeric]:
     ) -> R:
         return func(self.data, *args, **kwargs)
 
-    def pipe[**P](
+    def pipe[**P, R: Boolean | Numeric](
         self,
-        func: Callable[Concatenate[NDArray[T], P], NDArray[T]],
+        func: Callable[Concatenate[NDArray[T], P], NDArray[R]],
         *args: P.args,
         **kwargs: P.kwargs,
-    ) -> Self:
-        return self._new(func(self.data, *args, **kwargs))
+    ):
+        return Array(func(self.data, *args, **kwargs))
 
     def size(self, unit: Literal["kb", "mb", "gb"]) -> str:
         match unit:
@@ -60,31 +59,28 @@ class Array[T: Boolean | Numeric]:
             .replace("||", "|")
         )
 
-
-@dataclass(slots=True, repr=False)
-class NumericArray[T: Numeric](Array[T]):
-    def add(self, other: NDArray[T] | float | int) -> Self:
+    def add(self, other: IntoArr[T]) -> Self:
         return self._new(np.add(self.data, other))
 
-    def sub(self, other: NDArray[T] | float | int) -> Self:
+    def sub(self, other: IntoArr[T]) -> Self:
         return self._new(np.subtract(self.data, other))
 
-    def sub_r(self, other: NDArray[T] | float | int) -> Self:
+    def sub_r(self, other: IntoArr[T]) -> Self:
         return self._new(np.subtract(other, self.data))
 
-    def mul(self, other: NDArray[T] | float | int) -> Self:
+    def mul(self, other: IntoArr[T]) -> Self:
         return self._new(np.multiply(self.data, other))
 
-    def truediv(self, other: NDArray[T] | float | int) -> Self:
+    def truediv(self, other: IntoArr[T]) -> Self:
         return self._new(np.divide(self.data, other))
 
-    def truediv_r(self, other: NDArray[T] | float | int) -> Self:
+    def truediv_r(self, other: IntoArr[T]) -> Self:
         return self._new(np.divide(other, self.data))
 
-    def floor_div(self, other: NDArray[T] | float | int) -> Self:
+    def floor_div(self, other: IntoArr[T]) -> Self:
         return self._new(np.floor_divide(self.data, other))
 
-    def floor_div_r(self, other: NDArray[T] | float | int) -> Self:
+    def floor_div_r(self, other: IntoArr[T]) -> Self:
         return self._new(np.floor_divide(other, self.data))
 
     def sign(self) -> Self:
