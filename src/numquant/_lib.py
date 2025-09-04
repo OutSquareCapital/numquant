@@ -2,14 +2,20 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Concatenate, Literal, Self
 
-import _types as tp
 import numpy as np
+import polars as pl
 from numpy.typing import NDArray
+
+from ._types import Boolean, Numeric
 
 
 @dataclass(slots=True, repr=False)
-class Array[T: tp.Boolean | tp.Numeric]:
+class Array[T: Boolean | Numeric]:
     data: NDArray[T]
+
+    @classmethod
+    def from_df(cls, df: pl.DataFrame) -> Self:
+        return cls(data=df.to_numpy())
 
     def _new(self, data: NDArray[T]) -> Self:
         return self.__class__(data)
@@ -56,7 +62,7 @@ class Array[T: tp.Boolean | tp.Numeric]:
 
 
 @dataclass(slots=True, repr=False)
-class NumericArray[T: tp.Numeric](Array[T]):
+class NumericArray[T: Numeric](Array[T]):
     def add(self, other: NDArray[T] | float | int) -> Self:
         return self._new(np.add(self.data, other))
 
@@ -97,7 +103,7 @@ class NumericArray[T: tp.Numeric](Array[T]):
         return self._new(np.negative(self.data))
 
     def shift(self, n: int = 1) -> Self:
-        result = np.empty_like(self.data)
+        result: NDArray[T] = np.empty_like(self.data)
         if n >= 0:
             result[:n] = np.nan
             result[n:] = self.data[:-n]
