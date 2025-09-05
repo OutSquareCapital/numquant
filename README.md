@@ -1,7 +1,7 @@
-# Numquant: Method Chaining for Numpy Arrays
+# MapExpr: Method Chaining for Numpy Arrays in Polars
 
 ## Installation
 
 ```bash
-uv add git+https://github.com/OutSquareCapital/numquant.git
+uv add git+https://github.com/OutSquareCapital/mapexpr.git
 ```

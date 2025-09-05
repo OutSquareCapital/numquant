@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from functools import partial
-from typing import Concatenate, Self
+from typing import Concatenate, NamedTuple, Self
 
 import numpy as np
 import polars as pl
@@ -11,46 +11,41 @@ from ._types import IntoArr, NDArray, NumpyType
 type ArrFunc[T: NumpyType] = Callable[..., NDArray[T]]
 
 
+class MapArgs[T: NumpyType](NamedTuple):
+    func: ArrFunc[T]
+    return_dtype: pl.DataType
+
+
 @dataclass(slots=True, repr=False)
 class Array[T: NumpyType]:
-    data: NDArray[T]
+    expr: pl.Expr
     _funcs: list[ArrFunc[T]] = field(default_factory=list[ArrFunc[T]])
 
-    def into_expr(self) -> NDArray[T]:
-        for func in self._funcs:
-            self.data = func(self.data)
-        return self.data
+    def function(self, series: pl.Series):
+        return self._map_func(series.to_numpy())
 
-    @classmethod
-    def from_pl(cls, df: pl.DataFrame | pl.Series) -> Self:
-        return cls(data=df.to_numpy())
+    def _map_func(self, data: NDArray[T]):
+        for func in self._funcs:
+            data = func(data)
+        return data
 
     def _new(self, func: ArrFunc[T]) -> Self:
         self._funcs.append(func)
         return self
+
+    def into_expr(self, return_dtype: type[pl.DataType] | pl.DataType) -> pl.Expr:
+        return self.expr.map_batches(self.function, return_dtype=return_dtype)
 
     def pipe[**P, R: NumpyType](
         self,
         func: Callable[Concatenate[NDArray[T], P], NDArray[R]],
         *args: P.args,
         **kwargs: P.kwargs,
-    ):
-        return Array(func(self.data, *args, **kwargs))
+    ) -> "Array[R]":
+        def _(data: NDArray[T]) -> NDArray[R]:
+            return func(self._map_func(data), *args, **kwargs)
 
-    def __repr__(self) -> str:
-        return (
-            np.array2string(
-                self.data,
-                precision=2,
-                suppress_small=True,
-                separator="|",
-                max_line_width=10000,
-                edgeitems=5,
-            )
-            .replace("[", "|")
-            .replace("]", "|")
-            .replace("||", "|")
-        )
+        return Array[R](self.expr, [_])
 
     def add(self, other: IntoArr[T]) -> Self:
         return self._new(partial(np.add, other))

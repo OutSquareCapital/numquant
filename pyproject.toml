@@ -1,5 +1,5 @@
 [project]
-name = "numquant"
+name = "mapexpr"
 description = "Add your description here"
 version = "0.3"
 readme = "README.md"
@@ -17,3 +17,7 @@ dependencies = [
 rustats = { git = "https://github.com/OutSquareCapital/rustats.git" }
 numbagg = { git = "https://github.com/numbagg/numbagg.git" }
 bn-typed = { git = "https://github.com/OutSquareCapital/bottleneck-stubs.git" }
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
