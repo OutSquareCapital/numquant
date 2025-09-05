@@ -1,48 +1,41 @@
 from collections.abc import Callable
-from dataclasses import dataclass
-from typing import Concatenate, Literal, Self
+from dataclasses import dataclass, field
+from functools import partial
+from typing import Concatenate, Self
 
 import numpy as np
 import polars as pl
 
-from ._types import Boolean, IntoArr, NDArray, Numeric
+from ._types import IntoArr, NDArray, NumpyType
+
+type ArrFunc[T: NumpyType] = Callable[..., NDArray[T]]
 
 
 @dataclass(slots=True, repr=False)
-class Array[T: Boolean | Numeric]:
+class Array[T: NumpyType]:
     data: NDArray[T]
+    _funcs: list[ArrFunc[T]] = field(default_factory=list[ArrFunc[T]])
+
+    def __call__(self) -> NDArray[T]:
+        for func in self._funcs:
+            self.data = func(self.data)
+        return self.data
 
     @classmethod
-    def from_df(cls, df: pl.DataFrame) -> Self:
+    def from_pl(cls, df: pl.DataFrame | pl.Series) -> Self:
         return cls(data=df.to_numpy())
 
-    def _new(self, data: NDArray[T]) -> Self:
-        return self.__class__(data)
+    def _new(self, func: ArrFunc[T]) -> Self:
+        self._funcs.append(func)
+        return self
 
-    def into[**P, R](
-        self,
-        func: Callable[Concatenate[NDArray[T], P], R],
-        *args: P.args,
-        **kwargs: P.kwargs,
-    ) -> R:
-        return func(self.data, *args, **kwargs)
-
-    def pipe[**P, R: Boolean | Numeric](
+    def pipe[**P, R: NumpyType](
         self,
         func: Callable[Concatenate[NDArray[T], P], NDArray[R]],
         *args: P.args,
         **kwargs: P.kwargs,
     ):
         return Array(func(self.data, *args, **kwargs))
-
-    def size(self, unit: Literal["kb", "mb", "gb"]) -> str:
-        match unit:
-            case "kb":
-                return f"{round(self.data.nbytes / 1024, 2)} KB"
-            case "mb":
-                return f"{round(self.data.nbytes / 1024**2, 2)} MB"
-            case "gb":
-                return f"{round(self.data.nbytes / 1024**3, 2)} GB"
 
     def __repr__(self) -> str:
         return (
@@ -60,50 +53,52 @@ class Array[T: Boolean | Numeric]:
         )
 
     def add(self, other: IntoArr[T]) -> Self:
-        return self._new(np.add(self.data, other))
+        return self._new(partial(np.add, other))
 
     def sub(self, other: IntoArr[T]) -> Self:
-        return self._new(np.subtract(self.data, other))
+        def _(x: NDArray[T]) -> NDArray[T]:
+            return np.subtract(x, other)
+
+        return self._new(_)
 
     def sub_r(self, other: IntoArr[T]) -> Self:
-        return self._new(np.subtract(other, self.data))
+        return self._new(partial(np.subtract, other))
 
     def mul(self, other: IntoArr[T]) -> Self:
-        return self._new(np.multiply(self.data, other))
+        return self._new(partial(np.multiply, other))
 
     def truediv(self, other: IntoArr[T]) -> Self:
-        return self._new(np.divide(self.data, other))
+        def _(x: NDArray[T]) -> NDArray[T]:
+            return np.divide(x, other)
+
+        return self._new(_)
 
     def truediv_r(self, other: IntoArr[T]) -> Self:
-        return self._new(np.divide(other, self.data))
+        return self._new(partial(np.divide, other))
 
     def floor_div(self, other: IntoArr[T]) -> Self:
-        return self._new(np.floor_divide(self.data, other))
+        def _(x: NDArray[T]) -> NDArray[T]:
+            return np.floor_divide(x, other)
+
+        return self._new(_)
 
     def floor_div_r(self, other: IntoArr[T]) -> Self:
-        return self._new(np.floor_divide(other, self.data))
+        def _(x: NDArray[T]) -> NDArray[T]:
+            return np.floor_divide(other, x)
+
+        return self._new(_)
 
     def sign(self) -> Self:
-        return self._new(np.sign(self.data))
+        return self._new(np.sign)
 
     def abs(self) -> Self:
-        return self._new(np.abs(self.data))
+        return self._new(np.abs)
 
     def sqrt(self) -> Self:
-        return self._new(np.sqrt(self.data))
+        return self._new(np.sqrt)
 
     def pow(self, exponent: int) -> Self:
-        return self._new(np.power(self.data, exponent))
+        return self._new(partial(np.power, exponent))
 
     def neg(self) -> Self:
-        return self._new(np.negative(self.data))
-
-    def shift(self, n: int = 1) -> Self:
-        result: NDArray[T] = np.empty_like(self.data)
-        if n >= 0:
-            result[:n] = np.nan
-            result[n:] = self.data[:-n]
-        else:
-            result[n:] = np.nan
-            result[:n] = self.data[-n:]
-        return self._new(result)
+        return self._new(np.negative)

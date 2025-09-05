@@ -22,5 +22,5 @@ type Numeric = Float | Integer | UnsignedInteger
 
 Boolean = np.bool_
 
-
-type IntoArr[T: Boolean | Numeric] = NDArray[T] | float | int
+type NumpyType = Numeric | Boolean
+type IntoArr[T: NumpyType] = NDArray[T] | float | int

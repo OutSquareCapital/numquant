@@ -7,6 +7,7 @@ from ._types import (
     Int16,
     Int32,
     Int64,
+    NDArray,
     UInt8,
     UInt16,
     UInt32,
@@ -26,4 +27,5 @@ __all__: list[str] = [
     "UInt32",
     "UInt64",
     "Boolean",
+    "NDArray",
 ]

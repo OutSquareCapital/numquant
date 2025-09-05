@@ -1,3 +1,19 @@
+import numpy as np
+
+from ._types import NDArray, NumpyType
+
+
+def shift[T: NumpyType](data: NDArray[T], n: int = 1) -> NDArray[T]:
+    result: NDArray[T] = np.empty_like(data)
+    if n >= 0:
+        result[:n] = np.nan
+        result[n:] = data[:-n]
+    else:
+        result[n:] = np.nan
+        result[:n] = data[-n:]
+    return result
+
+
 """
 def replace(self, old: float, new: float) -> Self:
     # TODO: implement in rustats
