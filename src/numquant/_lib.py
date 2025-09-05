@@ -16,7 +16,7 @@ class Array[T: NumpyType]:
     data: NDArray[T]
     _funcs: list[ArrFunc[T]] = field(default_factory=list[ArrFunc[T]])
 
-    def __call__(self) -> NDArray[T]:
+    def into_expr(self) -> NDArray[T]:
         for func in self._funcs:
             self.data = func(self.data)
         return self.data
